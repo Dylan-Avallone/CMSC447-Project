@@ -1,16 +1,31 @@
-# This is a sample Python script.
+import sqlite3
+import streamlit as st
+import numpy as np
+import pandas as pd
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def load_db(dbname: str, sqlfiles) -> None:
+    with sqlite3.connect(dbname) as connection:
+        cursor = connection.cursor()
+        for file in sqlfiles:
+            f = open(file)
+            sql = f.read()
+            f.close()
+            commands = sql.split(';')
+            for command in commands:
+                cursor.execute(command)
 
+def print_table(dbname: str, table: str) -> None:
+    with sqlite3.connect(dbname) as connection:
+        cursor = connection.cursor()
+        result = cursor.execute("SELECT * FROM Users;")
+        rows = result.fetchall()
+        for row in rows:
+            for value in row:
+                print(value)
+                st.write(str(value))
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+load_db('test.db', ['dropDashboardTables.sql',
+                                   'createDashboardTables.sql',
+                                   'loadStaticDashboardTables.sql'])
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+print_table('test.db', 'Users')
