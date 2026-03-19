@@ -53,3 +53,12 @@ CREATE TABLE IF NOT EXISTS PrinterUsage (
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (printer_id) REFERENCES Printer(printer_id)
 );
+
+CREATE TABLE IF NOT EXISTS FeedbackForms (
+    form_id INT AUTO_INCREMENT PRIMARY KEY,
+    form_type VARCHAR(30) DEFAULT 'bug report',
+    form_content VARCHAR(1000) NOT NULL,
+    submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);

@@ -46,6 +46,11 @@ VALUES
 	('Printer 3', 'available'),
 	('Printer 4', 'available'),
 	('Printer 5', 'available');
+
+INSERT INTO PrinterUsage (pages_printed, print_time)
+VALUES
+    (3, datetime('03/18/2026 23:59:48.990')),
+    (10, datetime('3/17/2026 6:26:37:.847'));
     
     
 
