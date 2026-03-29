@@ -3,16 +3,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-def load_db(dbname: str, sqlfiles) -> None:
-    with sqlite3.connect(dbname) as connection:
-        cursor = connection.cursor()
-        for file in sqlfiles:
-            f = open(file)
-            sql = f.read()
-            f.close()
-            commands = sql.split(';')
-            for command in commands:
-                cursor.execute(command)
+
 
 def print_table(dbname: str, table: str) -> None:
     with sqlite3.connect(dbname) as connection:
@@ -24,8 +15,13 @@ def print_table(dbname: str, table: str) -> None:
                 print(value)
                 st.write(str(value))
 
+if st.button("Feedback Form"):
+    st.switch_page("pages/feedback_form.py")
+
+"""
 load_db('test.db', ['dropDashboardTables.sql',
                                    'createDashboardTables.sql',
                                    'loadStaticDashboardTables.sql'])
 
 print_table('test.db', 'Users')
+"""
