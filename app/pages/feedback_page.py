@@ -3,9 +3,10 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from app.backend.db import DB
+from app.backend.get_db import get_db
 
-db = DB()
+db = get_db()
+
 option = st.selectbox(
     "Select an option",
     ["Bug Report",
