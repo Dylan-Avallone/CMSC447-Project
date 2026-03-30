@@ -18,3 +18,6 @@ if st.button("Feedback Form"):
 
 if st.button("Login"):
     st.switch_page("pages/login_page.py")
+
+if st.button("Main Page"):
+    st.switch_page("pages/main_page.py")
