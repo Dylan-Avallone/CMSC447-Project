@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from app.backend.get_db import get_db
 
-db = get_db()
+db = get_db("library_data")
 
 option = st.selectbox(
     "Select an option",
@@ -20,3 +20,4 @@ submit = st.button("Submit")
 if submit:
     db.add_feedback(option, content)
     st.write(db.get_printable_table("FeedbackForms"))
+    st.write(db.tables)

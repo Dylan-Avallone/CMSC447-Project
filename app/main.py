@@ -8,8 +8,10 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from app.backend.get_db import get_db
+db = None
 
-db = get_db()
+def startup():
+    db = get_db("library_data")
 
 if st.button("Feedback Form"):
     st.switch_page("pages/feedback_page.py")
