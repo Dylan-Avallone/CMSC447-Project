@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS Users (
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
     user_name VARCHAR(100) NOT NULL,
-    user_email VARCHAR(100) UNIQUE
-    );
+    user_email VARCHAR(100) UNIQUE,
+    user_password VARCHAR(100)
+);
 
 CREATE TABLE IF NOT EXISTS Departments (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
