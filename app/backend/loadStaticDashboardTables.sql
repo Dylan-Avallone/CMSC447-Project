@@ -1,7 +1,3 @@
-INSERT INTO Users (user_name, user_email, user_password)
-VALUES
-    ('Ryan', 'ryano3@umbc.edu', 'password');
-
 INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
 VALUES
     ('Computer Science', 'CS', 'Dr. Mohamed Younis', 'ITE 325'),
