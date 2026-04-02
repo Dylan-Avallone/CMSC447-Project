@@ -1,16 +1,28 @@
-# This is a sample Python script.
+from fastapi import FastAPI, HTTPException
+from models import LoginRequest, LoginResponse, Department, DepartmentDetail
+from auth import authenticate
+from data import departments, department_info
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+app = FastAPI(title="Library Dashboard Prototype")
 
+# --- Authentication endpoint ---
+@app.post("/login", response_model=LoginResponse)
+def login(request: LoginRequest):
+    if authenticate(request.email, request.password):
+        return LoginResponse(success=True, message="Login successful")
+    else:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# --- Get list of departments ---
+@app.get("/departments", response_model=list[Department])
+def get_departments():
+    return departments
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# --- Get department details ---
+@app.get("/departments/{dept_id}", response_model=DepartmentDetail)
+def get_department_detail(dept_id: int):
+    dept = next((d for d in departments if d["id"] == dept_id), None)
+    if not dept:
+        raise HTTPException(status_code=404, detail="Department not found")
+    info = department_info.get(dept_id, {})
+    return DepartmentDetail(id=dept["id"], name=dept["name"], description=info.get("description", ""))
