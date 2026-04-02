@@ -1,0 +1,4 @@
+requirements.txt
+streamlit==1.55.0
+Authlib==1.6.9
+pandas==2.3.3
