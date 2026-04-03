@@ -1,5 +1,7 @@
 import requests
 from datetime import datetime, timedelta
+#TODO: Single out rooms that are unavailable
+#TODO: Map itemId to rooms in database
 
 def scrape_room_availability():
     url = "https://umbc.libcal.com/spaces/availability/grid"
