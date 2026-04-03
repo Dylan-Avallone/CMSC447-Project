@@ -1,8 +1,21 @@
+-- First two tables enumerate allowed values for the status of a room/book/printer, and the type of a room
+CREATE TABLE IF NOT EXISTS Status (
+    status TEXT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS Room_Type (
+    type TEXT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS Feedback_Type (
+    type TEXT PRIMARY KEY
+);
+
 CREATE TABLE IF NOT EXISTS Users (
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
     user_name VARCHAR(100) NOT NULL,
     user_email VARCHAR(100) UNIQUE,
-    user_password VARCHAR(100)
+    --user_password VARCHAR(100) (Deprecated since login goes through google)
 );
 
 CREATE TABLE IF NOT EXISTS Departments (
@@ -13,27 +26,31 @@ CREATE TABLE IF NOT EXISTS Departments (
     office_location VARCHAR(100)
 );
 
-CREATE TABLE IF NOT EXISTS Room (
+CREATE TABLE IF NOT EXISTS RoomReservation (
     reservation_id INT AUTO_INCREMENT PRIMARY KEY,
-    room_name VARCHAR(30),
-    is_available VARCHAR(30) DEFAULT 'available',
+    purpose TEXT,
+    reservation_date DATE DEFAULT CURRENT_DATE,
+    start_time TIME DEFAULT CURRENT_TIME,
+    end_time TIME DEFAULT CURRENT_TIME,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE IF NOT EXISTS RoomReserved (
-    reservation_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    user_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+CREATE TABLE IF NOT EXISTS Room (
+    room_name VARCHAR(30) NOT NULL,
+    room_location VARCHAR(30) UNIQUE NOT NULL,
+    type VARCHAR(10) DEFAULT 'group'
+    capacity INT CHECK(typeof(capacity = 'integer')),
+    status VARCHAR(30) DEFAULT 'available'
 );
 
 CREATE TABLE IF NOT EXISTS BookLocator (
     book_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
     author VARCHAR(100),
-    isbn VARCHAR(20) UNIQUE,
+    isbn TEXT UNIQUE CHECK(length(isbn) == 13),
     shelf_location VARCHAR(50),
     availability_status VARCHAR(20) DEFAULT 'available'
 );

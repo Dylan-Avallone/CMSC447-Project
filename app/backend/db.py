@@ -14,9 +14,6 @@ class DB:
         with sqlite3.connect(self.filename) as connection:
             cursor = connection.cursor()
             for file in sqlfiles:
-                f = open(os.path.join(BASE_DIR, file), 'r')
-                sqlfile = f.read()
-                f.close()
                 with open(os.path.join(BASE_DIR, file), 'r') as f:
                     sqlfile = f.read()
 
@@ -53,9 +50,6 @@ class DB:
                 returnval = False
             else:
                 returnval = bcrypt.checkpw(password.encode(), result[3])
-
-            return returnval
-
 
         return bool(returnval)
 

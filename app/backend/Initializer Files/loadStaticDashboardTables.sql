@@ -1,3 +1,20 @@
+-- Allowed values for status fields in room, printer, book, and type fields in room and feedback
+INSERT INTO Status
+VALUES
+    ('available'),
+    ('reserved'),
+    ('closed');
+
+INSERT INTO Room_Type
+VALUES
+    ('individual'),
+    ('group');
+
+INSERT INTO Feedback_Type
+VALUES
+    ('bug report'),
+    ('feature request');
+
 INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
 VALUES
     ('Computer Science', 'CS', 'Dr. Mohamed Younis', 'ITE 325'),
@@ -13,13 +30,23 @@ VALUES
 	('Psychology', 'PSYC', 'Dr. Lira Yoon', 'MP 312'),
 	('Sociology, Anthropology, and Public Health', 'SAPH', 'Dr. Andrea Kalfoglou', 'PUP 233');
     
-INSERT INTO Room (room_name, is_available)
+INSERT INTO Room (room_name, room_location, type, capacity)
 VALUES
-('Room 1', 'available'),
-('Room 2', 'available'),
-('Room 3', 'available'),
-('Room 4', 'available'),
-('Room 5', 'available');
+('Group Study Room 1', '210', 'group', 2),
+('Group Study Room 2', '211', 'group', 2),
+('Group Study Room 3', '212', 'group', 2),
+('Group Study Room 4', '213', 'group', 2),
+('Group Study Room 5', '369', 'group', 2),
+('Group Study Room 6', '370', 'group', 2),
+('Group Study Room 7', '371', 'group', 2),
+('Group Study Room 8', '372', 'group', 2),
+('Group Study Room 9', '373', 'group', 2),
+('Group Study Room 10', '374', 'group', 2),
+('Group Study Room 11', '453', 'group', 4),
+('Group Study Room 12', '454', 'group', 4),
+('Group Study Room 13', '456', 'group', 4),
+('Group Study Room 14', '457', 'group', 4),
+('Individual Study Room 1', '204', 'individual', 1),
 
 INSERT INTO BookLocator (title, author, isbn, shelf_location, availability_status)
 VALUES

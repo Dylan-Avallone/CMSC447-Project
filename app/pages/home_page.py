@@ -18,15 +18,11 @@ with right:
 
 
 #is user logged into umbc
-if hasattr(st.user, "is_logged_in") and st.user.is_logged_in:
-    name = getattr(st.user, "name", "") or "User"
-    email = getattr(st.user, "email", "") or "No email available"
-    picture = getattr(st.user, "picture", None)
-
-    if email == "ethanj3@umbc.edu".lower():
-        st.title("Welcome Drex")
-        st.image(ASSETS_DIR / "important.jpg", width=800)
-
+if st.user.is_logged_in:
+    userInfoDict = st.user.to_dict()
+    name = userInfoDict["name"]
+    email = userInfoDict["email"]
+    picture = userInfoDict["picture"]
 
     with st.container():
         
@@ -52,7 +48,6 @@ st.subheader("Navigation")
 col1, col2 = st.columns(2)
 
 with col1:
-
     if st.user.is_logged_in is False:
         if st.button("Login", use_container_width=True):
             st.switch_page("pages/login_page.py")
@@ -64,6 +59,10 @@ with col1:
     if st.user.is_logged_in is True:
         if st.button("Room Reservations", use_container_width=True):
             st.switch_page("pages/room_reservations_page.py")
+
+    if st.user.is_logged_in is True:
+        if st.button("Upcoming Events", use_container_width=True):
+            st.switch_page("pages/upcoming_events_page.py")
 
 with col2:
     if st.button("Feedback Form", use_container_width=True):

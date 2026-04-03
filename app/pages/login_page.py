@@ -25,7 +25,7 @@ then restart Streamlit.""",
 if not st.user.is_logged_in:
     st.write("Use Google to sign in.")
     if st.button("Sign in with Google", use_container_width=True):
-        st.login()
+        st.login("google")
     st.stop()
 
 email = st.user.get("email", "")
