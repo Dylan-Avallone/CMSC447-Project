@@ -41,9 +41,11 @@ CREATE TABLE IF NOT EXISTS RoomReservation (
 CREATE TABLE IF NOT EXISTS Room (
     room_name VARCHAR(30) NOT NULL,
     room_location VARCHAR(30) UNIQUE NOT NULL,
-    type VARCHAR(10) DEFAULT 'group'
+    type TEXT,
     capacity INT CHECK(typeof(capacity = 'integer')),
-    status VARCHAR(30) DEFAULT 'available'
+    status TEXT,
+    FOREIGN KEY (type) REFERENCES Room_Type(type),
+    FOREIGN KEY (status) REFERENCES Status(status);
 );
 
 CREATE TABLE IF NOT EXISTS BookLocator (
@@ -52,13 +54,14 @@ CREATE TABLE IF NOT EXISTS BookLocator (
     author VARCHAR(100),
     isbn TEXT UNIQUE CHECK(length(isbn) == 13),
     shelf_location VARCHAR(50),
-    availability_status VARCHAR(20) DEFAULT 'available'
+    status TEXT,
+    FOREIGN KEY (status) REFERENCES Status(status);
 );
 
 CREATE TABLE IF NOT EXISTS Printer(
 	printer_id INT AUTO_INCREMENT PRIMARY KEY,
     printer_name VARCHAR(50) NOT NULL,
-    curr_status VARCHAR(30) DEFAULT 'available',
+    status TEXT,
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
     );

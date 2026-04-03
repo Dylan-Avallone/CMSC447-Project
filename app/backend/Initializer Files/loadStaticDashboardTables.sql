@@ -47,6 +47,13 @@ VALUES
 ('Group Study Room 13', '456', 'group', 4),
 ('Group Study Room 14', '457', 'group', 4),
 ('Individual Study Room 1', '204', 'individual', 1),
+('Individual Study Room 2', '205', 'individual', 1),
+('Individual Study Room 3', '206', 'individual', 1),
+('Individual Study Room 4', '207', 'individual', 1),
+('Individual Study Room 5', '208', 'individual', 1),
+('Individual Study Room 6', '209', 'individual', 1),
+('Individual Study Room 7', '231', 'individual', 1),
+('Individual Study Room 8', '232', 'individual', 1);
 
 INSERT INTO BookLocator (title, author, isbn, shelf_location, availability_status)
 VALUES
