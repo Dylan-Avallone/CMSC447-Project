@@ -1,3 +1,6 @@
 streamlit==1.55.0
 Authlib==1.6.9
 pandas==2.3.3
+fastapi>=0.135.0
+uvicorn>=0.22.0
+pydantic>=2.12.0
