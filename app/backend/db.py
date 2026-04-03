@@ -17,6 +17,8 @@ class DB:
                 f = open(os.path.join(BASE_DIR, file), 'r')
                 sqlfile = f.read()
                 f.close()
+                with open(os.path.join(BASE_DIR, file), 'r') as f:
+                    sqlfile = f.read()
 
                 sqlCommands = sqlfile.split(';')
                 for command in sqlCommands:
@@ -26,7 +28,8 @@ class DB:
         with sqlite3.connect(self.filename) as connection:
             cursor = connection.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-            return cursor.fetchall()
+
+        return cursor.fetchall()
 
     def add_feedback(self, form_type, form_content):
         with sqlite3.connect(self.filename) as connection:
@@ -70,3 +73,35 @@ class DB:
             result = cursor.fetchall()
 
         return result
+
+    def get_room_reservations(self):
+        query = """
+        SELECT
+            rr.reservation_id,
+            r.room_name,
+            r.room_location,
+            r.capacity,
+            u.user_name,
+            rr.purpose,
+            rr.reservation_date,
+            rr.start_time,
+            rr.end_time,
+            rr.status,
+            rr.notes,
+            rr.created_at
+        FROM RoomReservations rr
+        JOIN Room r ON rr.room_id = r.room_id
+        JOIN Users u ON rr.user_id = u.user_id
+        ORDER BY rr.reservation_date ASC, rr.start_time ASC
+        """
+        return self.execute_command(query, ())
+
+
+    def get_rooms(self):
+        query = """
+        SELECT room_id, room_name, room_location, capacity, room_type
+        FROM Room
+        ORDER BY room_name ASC
+        """
+        return self.execute_command(query, ())
+

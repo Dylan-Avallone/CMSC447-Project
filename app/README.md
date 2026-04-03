@@ -14,3 +14,4 @@ The backend is planned to use **FastAPI**. It will handle application logic, con
 - Streamlit
 - FastAPI
 - SQL Database
+
