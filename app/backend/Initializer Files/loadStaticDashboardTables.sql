@@ -1,20 +1,4 @@
 -- Allowed values for status fields in room, printer, book, and type fields in room and feedback
-INSERT INTO Status
-VALUES
-    ('available'),
-    ('reserved'),
-    ('closed');
-
-INSERT INTO Room_Type
-VALUES
-    ('individual'),
-    ('group');
-
-INSERT INTO Feedback_Type
-VALUES
-    ('bug report'),
-    ('feature request');
-
 INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
 VALUES
     ('Computer Science', 'CS', 'Dr. Mohamed Younis', 'ITE 325'),
@@ -55,7 +39,7 @@ VALUES
 ('Individual Study Room 7', '231', 'individual', 1),
 ('Individual Study Room 8', '232', 'individual', 1);
 
-INSERT INTO BookLocator (title, author, isbn, shelf_location, availability_status)
+INSERT INTO BookLocator (title, author, isbn, shelf_location, status)
 VALUES
 	('The Great Gatsby', 'F. Scott Fitzgerald', '9780743273565', 'FIC-FITZ-001', 'Available'),
 	('A Brief History of Time', 'Stephen Hawking', '9780553380163', 'SCI-HAWK-502', 'Checked Out'),
@@ -73,7 +57,7 @@ VALUES
 	('Circe', 'Madeline Miller', '9780316556347', 'MYTH-MILL-219', 'Checked Out'),
 	('Quiet: The Power of Introverts', 'Susan Cain', '9780307352156', 'PSY-CAIN-332', 'Available');
 
-INSERT INTO Printer (printer_name, curr_status)
+INSERT INTO Printer (printer_name, status)
 VALUES
 	('Printer 1', 'available'),
 	('Printer 2', 'available'),

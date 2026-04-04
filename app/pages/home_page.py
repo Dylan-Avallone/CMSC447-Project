@@ -1,5 +1,8 @@
 import streamlit as st
 from pathlib import Path
+from app.backend.room_availability_scraper import *
+
+scrape_hourly()
 
 st.set_page_config(page_title="Library Dashboard", page_icon="X", layout="wide")
 

@@ -3,8 +3,7 @@ import pandas as pd
 import sys
 from pathlib import Path
 
-#SECURITY check lol
-if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
+if not st.user.is_logged_in:
     st.warning("You must be signed in to access this page.")
     if st.button("Go to Login"):
         st.switch_page("pages/login_page.py")

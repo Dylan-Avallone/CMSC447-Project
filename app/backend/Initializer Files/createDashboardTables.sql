@@ -1,5 +1,9 @@
 -- First two tables enumerate allowed values for the status of a room/book/printer, and the type of a room
-CREATE TABLE IF NOT EXISTS Status (
+CREATE TABLE IF NOT EXISTS Book_Status (
+    status TEXT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS Room_Status (
     status TEXT PRIMARY KEY
 );
 
@@ -14,8 +18,7 @@ CREATE TABLE IF NOT EXISTS Feedback_Type (
 CREATE TABLE IF NOT EXISTS Users (
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
     user_name VARCHAR(100) NOT NULL,
-    user_email VARCHAR(100) UNIQUE,
-    --user_password VARCHAR(100) (Deprecated since login goes through google)
+    user_email VARCHAR(100) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS Departments (
@@ -35,17 +38,18 @@ CREATE TABLE IF NOT EXISTS RoomReservation (
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    room_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (room_id) REFERENCES Room(room_id)
 );
 
 CREATE TABLE IF NOT EXISTS Room (
+    room_id INT AUTO_INCREMENT PRIMARY KEY,
     room_name VARCHAR(30) NOT NULL,
     room_location VARCHAR(30) UNIQUE NOT NULL,
     type TEXT,
-    capacity INT CHECK(typeof(capacity = 'integer')),
-    status TEXT,
-    FOREIGN KEY (type) REFERENCES Room_Type(type),
-    FOREIGN KEY (status) REFERENCES Status(status);
+    capacity INT,
+    status TEXT
 );
 
 CREATE TABLE IF NOT EXISTS BookLocator (
@@ -54,8 +58,7 @@ CREATE TABLE IF NOT EXISTS BookLocator (
     author VARCHAR(100),
     isbn TEXT UNIQUE CHECK(length(isbn) == 13),
     shelf_location VARCHAR(50),
-    status TEXT,
-    FOREIGN KEY (status) REFERENCES Status(status);
+    status TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Printer(
@@ -77,7 +80,7 @@ CREATE TABLE IF NOT EXISTS PrinterUsage (
 
 CREATE TABLE IF NOT EXISTS FeedbackForms (
     form_id INT AUTO_INCREMENT PRIMARY KEY,
-    form_type VARCHAR(30) DEFAULT 'bug report',
+    form_type TEXT,
     form_content VARCHAR(1000) NOT NULL,
     submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INT,
