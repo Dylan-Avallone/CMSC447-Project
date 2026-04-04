@@ -1,28 +1,12 @@
 -- First two tables enumerate allowed values for the status of a room/book/printer, and the type of a room
-CREATE TABLE IF NOT EXISTS Book_Status (
-    status TEXT PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS Room_Status (
-    status TEXT PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS Room_Type (
-    type TEXT PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS Feedback_Type (
-    type TEXT PRIMARY KEY
-);
-
 CREATE TABLE IF NOT EXISTS Users (
-	user_id INT AUTO_INCREMENT PRIMARY KEY,
+	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_name VARCHAR(100) NOT NULL,
     user_email VARCHAR(100) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS Departments (
-    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_id INTEGER PRIMARY KEY AUTOINCREMENT,
     department_name VARCHAR(100) NOT NULL,
     department_code VARCHAR(20) UNIQUE,
     faculty_head VARCHAR(100),
@@ -30,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Departments (
 );
 
 CREATE TABLE IF NOT EXISTS RoomReservation (
-    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
     purpose TEXT,
     reservation_date DATE DEFAULT CURRENT_DATE,
     start_time TIME DEFAULT CURRENT_TIME,
@@ -38,13 +22,14 @@ CREATE TABLE IF NOT EXISTS RoomReservation (
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INT,
-    room_id INT,
+    room_location TEXT,
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (room_id) REFERENCES Room(room_id)
+    FOREIGN KEY (room_location) REFERENCES Room(room_location),
+    UNIQUE(reservation_date, start_time, end_time, room_location)
 );
 
 CREATE TABLE IF NOT EXISTS Room (
-    room_id INT AUTO_INCREMENT PRIMARY KEY,
+    room_id INTEGER PRIMARY KEY AUTOINCREMENT,
     room_name VARCHAR(30) NOT NULL,
     room_location VARCHAR(30) UNIQUE NOT NULL,
     type TEXT,
@@ -53,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Room (
 );
 
 CREATE TABLE IF NOT EXISTS BookLocator (
-    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INTEGER PRIMARY KEY AUTOINCREMENT,
     title VARCHAR(500) NOT NULL,
     author VARCHAR(100),
     isbn TEXT UNIQUE CHECK(length(isbn) == 13),
@@ -62,7 +47,7 @@ CREATE TABLE IF NOT EXISTS BookLocator (
 );
 
 CREATE TABLE IF NOT EXISTS Printer(
-	printer_id INT AUTO_INCREMENT PRIMARY KEY,
+	printer_id INTEGER PRIMARY KEY AUTOINCREMENT,
     printer_name VARCHAR(50) NOT NULL,
     status TEXT,
     user_id INT,
@@ -79,7 +64,7 @@ CREATE TABLE IF NOT EXISTS PrinterUsage (
 );
 
 CREATE TABLE IF NOT EXISTS FeedbackForms (
-    form_id INT AUTO_INCREMENT PRIMARY KEY,
+    form_id INTEGER PRIMARY KEY AUTOINCREMENT,
     form_type TEXT,
     form_content VARCHAR(1000) NOT NULL,
     submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -39,21 +39,17 @@ rows = db.get_room_reservations()
 
 columns = [
     "Reservation ID",
-    "Room",
-    "Location",
-    "Capacity",
-    "Reserved By",
     "Purpose",
-    "Date",
+    "Reservation Date",
     "Start Time",
     "End Time",
-    "Status",
     "Notes",
-    "Created At"
+    "Created At",
+    "Reserved By",
+    "Room Location"
 ]
 
 df = pd.DataFrame(rows, columns=columns)
-
 
 if df.empty:
     st.info("No reservation data available yet.")
@@ -62,21 +58,16 @@ if df.empty:
 # -----------------------------
 # Cleanup / formatting
 
-df["Date"] = pd.to_datetime(df["Date"]).dt.date
-df["Start Time"] = df["Start Time"].astype(str).str[:5]
-df["End Time"] = df["End Time"].astype(str).str[:5]
-df["Created At"] = pd.to_datetime(df["Created At"], errors="coerce")
-
 today = date.today()
 
 def classify_period(reservation_date):
-    if reservation_date < today:
+    if date.fromisoformat(reservation_date) < today:
         return "Past"
-    elif reservation_date == today:
+    elif date.fromisoformat(reservation_date) == today:
         return "Today"
     return "Future"
 
-df["Period"] = df["Date"].apply(classify_period)
+df["Period"] = df["Reservation Date"].apply(classify_period)
 
 # -----------------------------
 # Top metrics
@@ -85,14 +76,12 @@ total_reservations = len(df)
 past_count = len(df[df["Period"] == "Past"])
 today_count = len(df[df["Period"] == "Today"])
 future_count = len(df[df["Period"] == "Future"])
-pending_count = len(df[df["Status"].str.lower() == "pending"])
 
 m1, m2, m3, m4, m5 = st.columns(5)
 m1.metric("Total", total_reservations)
 m2.metric("Past", past_count)
 m3.metric("Today", today_count)
 m4.metric("Upcoming", future_count)
-m5.metric("Pending", pending_count)
 
 st.markdown("---")
 
@@ -116,12 +105,8 @@ with c2:
     )
 
 with c3:
-    room_options = ["All"] + sorted(df["Room"].dropna().unique().tolist())
+    room_options = ["All"] + sorted(df["Room Location"].dropna().unique().tolist())
     room_filter = st.selectbox("Room", room_options)
-
-with c4:
-    status_options = ["All"] + sorted(df["Status"].dropna().unique().tolist())
-    status_filter = st.selectbox("Status", status_options)
 
 filtered_df = df.copy()
 
@@ -136,15 +121,12 @@ if period_filter != "All":
     filtered_df = filtered_df[filtered_df["Period"] == period_filter]
 
 if room_filter != "All":
-    filtered_df = filtered_df[filtered_df["Room"] == room_filter]
+    filtered_df = filtered_df[filtered_df["Room Location"] == room_filter]
 
-if status_filter != "All":
-    filtered_df = filtered_df[filtered_df["Status"] == status_filter]
-
-filtered_df = filtered_df.sort_values(
-    by=["Date", "Start Time", "Room"],
-    ascending=[True, True, True]
-)
+#filtered_df = filtered_df.sort_values(
+    #by=["Date", "Start Time", "Room"],
+    #ascending=[True, True, True]
+#)
 
 
 # -----------------------------
@@ -152,19 +134,7 @@ filtered_df = filtered_df.sort_values(
 
 st.subheader("Reservation Timeline")
 
-display_df = filtered_df[
-    [
-        "Date",
-        "Start Time",
-        "End Time",
-        "Room",
-        "Location",
-        "Reserved By",
-        "Purpose",
-        "Status",
-        "Notes"
-    ]
-]
+display_df = filtered_df[columns]
 
 st.dataframe(
     display_df,

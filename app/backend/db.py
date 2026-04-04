@@ -22,7 +22,10 @@ class DB:
 
                 sqlCommands = sqlfile.split(';')
                 for command in sqlCommands:
-                    cursor.execute(command)
+                    try:
+                        cursor.execute(command)
+                    except sqlite3.IntegrityError: # Get past the unique constraint by simply not adding the item
+                        pass
 
     def get_tables(self):
         with sqlite3.connect(self.dbpath) as connection:
@@ -43,10 +46,13 @@ class DB:
             cursor.execute("INSERT INTO Users (user_name, user_email, user_password) VALUES (?, ?, ?)", (username, email, hashedpassword))
             connection.commit()
 
-    def add_room_reservation(self, reservation_date, start_time, end_time, room_id):
+    def add_room_reservation(self, reservation_date, start_time, end_time, room_location):
         with sqlite3.connect(self.dbpath) as connection:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO RoomReservation (reservation_date, start_time, end_time, room_id) VALUES (?, ?, ?, ?)", (reservation_date, start_time, end_time, room_id))
+            try:
+                cursor.execute("INSERT INTO RoomReservation (reservation_date, start_time, end_time, room_location) VALUES (?, ?, ?, ?)", (reservation_date, start_time, end_time, room_location))
+            except sqlite3.IntegrityError: # Also ignore duplicates here, rather than inserting them again
+                pass
 
     def check_credentials(self, email, password):
         with sqlite3.connect(self.dbpath) as connection:
@@ -80,19 +86,17 @@ class DB:
         query = """
         SELECT
             rr.reservation_id,
-            r.room_name,
-            r.room_location,
-            r.capacity,
-            u.user_name,
             rr.purpose,
             rr.reservation_date,
             rr.start_time,
             rr.end_time,
             rr.notes,
-            rr.created_at
+            rr.created_at,
+            u.user_name,
+            r.room_location
         FROM RoomReservation rr
-        JOIN Room r ON rr.room_id = r.room_id
-        JOIN Users u ON rr.user_id = u.user_id
+        LEFT JOIN Users u ON rr.user_id = u.user_id
+        LEFT JOIN Room r ON rr.room_location = r.room_location
         ORDER BY rr.reservation_date ASC, rr.start_time ASC
         """
         return self.execute_command(query, ())

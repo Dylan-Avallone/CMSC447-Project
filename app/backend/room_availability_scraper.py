@@ -1,6 +1,6 @@
 import requests
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from app.backend.get_db import get_db
 
 class RoomAvailabilityScraper:
@@ -52,9 +52,9 @@ class RoomAvailabilityScraper:
             19782: '232'
         }
 
-    def scrape_room_availability(self):
+    def scrape_room_availability(self, num_days):
         self.data["start"] = datetime.now().strftime("%Y-%m-%d")
-        self.data["end"] = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+        self.data["end"] = (datetime.now() + timedelta(days=num_days)).strftime("%Y-%m-%d")
 
         res = requests.post(self.url, headers=self.headers, data=self.data)
 
@@ -82,13 +82,13 @@ class RoomAvailabilityScraper:
                     reservation_date = slot["start"][0:10]
                     start_time = slot["start"][11:]
                     end_time = slot["end"][11:]
-                    room_id = self.itemIdtoRoomMap[slot["itemId"]]
-                    db.add_room_reservation(reservation_date, start_time, end_time, room_id)
+                    room_location = self.itemIdtoRoomMap[slot["itemId"]]
+                    db.add_room_reservation(reservation_date, start_time, end_time, room_location)
 
-@st.cache_data(ttl=3600)
+#@st.cache_data(ttl=3600)
 def scrape_hourly():
-    print("Scraping Room Availability")
-    ra_scraper = RoomAvailabilityScraper()
+    # 5/23/26 is a week out from start of finals, the calendar stops showing slots on this day
+    days_until_semester_end = (date.fromisoformat("2026-05-23") - date.today()).days
+    ra_scraper = RoomAvailabilityScraper(days_until_semester_end)
     availability_data = ra_scraper.scrape_room_availability()
-    current_bookings = ra_scraper.get_current_bookings(availability_data)
-    ra_scraper.send_to_db(current_bookings)
+    ra_scraper.send_to_db(availability_data)
