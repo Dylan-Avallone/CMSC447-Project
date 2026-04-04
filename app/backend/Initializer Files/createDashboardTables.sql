@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Printer(
     status TEXT,
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS PrinterUsage (
     pages_printed INT,

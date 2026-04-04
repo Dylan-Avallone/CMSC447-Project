@@ -1,6 +1,8 @@
 import requests
 import streamlit as st
 from datetime import datetime, timedelta, date
+
+
 from app.backend.get_db import get_db
 
 class RoomAvailabilityScraper:
@@ -89,6 +91,6 @@ class RoomAvailabilityScraper:
 def scrape_hourly():
     # 5/23/26 is a week out from start of finals, the calendar stops showing slots on this day
     days_until_semester_end = (date.fromisoformat("2026-05-23") - date.today()).days
-    ra_scraper = RoomAvailabilityScraper(days_until_semester_end)
-    availability_data = ra_scraper.scrape_room_availability()
+    ra_scraper = RoomAvailabilityScraper()
+    availability_data = ra_scraper.scrape_room_availability(10)
     ra_scraper.send_to_db(availability_data)
