@@ -53,10 +53,21 @@ class RoomAvailabilityScraper:
             19774: '231',
             19782: '232'
         }
+        self.maxRequestableDays = 31
 
+    # Apparently, requesting more than 31 days of room booking data causes an error. To handle this, then, I will split requests for more than 31 days of data into multiple
     def scrape_room_availability(self, num_days):
-        self.data["start"] = datetime.now().strftime("%Y-%m-%d")
-        self.data["end"] = (datetime.now() + timedelta(days=num_days)).strftime("%Y-%m-%d")
+        result = {}
+        startDay = datetime.now()
+        endDay = datetime.now()
+        while num_days > 0:
+            if num_days > self.maxRequestableDays:
+                endDay = endDay + timedelta(days=self.maxRequestableDays)
+            else:
+                endDay = endDay + timedelta(days=num_days)
+
+            self.data["start"] = datetime.now().strftime("%Y-%m-%d")
+            self.data["end"] = (datetime.now() + timedelta(days=num_days)).strftime("%Y-%m-%d")
 
         res = requests.post(self.url, headers=self.headers, data=self.data)
 
@@ -90,7 +101,31 @@ class RoomAvailabilityScraper:
 #@st.cache_data(ttl=3600)
 def scrape_hourly():
     # 5/23/26 is a week out from start of finals, the calendar stops showing slots on this day
-    days_until_semester_end = (date.fromisoformat("2026-05-23") - date.today()).days
+    days_until_semester_end = get_days_until_semester_end()
     ra_scraper = RoomAvailabilityScraper()
     availability_data = ra_scraper.scrape_room_availability(10)
     ra_scraper.send_to_db(availability_data)
+
+# Gotta see what the library availability is like for summer and winter semesters
+def get_days_until_semester_end():
+    returnVal = None
+    today = date.today()
+    currYear = today.year
+
+    springSemStart = date(currYear, 1, 19)
+    springSemEnd = date(currYear, 5, 30)
+
+    fallSemStart = date(currYear, 8, 25)
+    fallSemEnd = date(currYear, 12, 27)
+
+    if springSemStart <= today <= springSemEnd: # Spring Semester
+        returnVal = (springSemEnd - today).days
+    elif fallSemStart <= today <= fallSemEnd: # Fall Semester
+        returnVal = (fallSemEnd - today).days
+    else:
+        returnVal = 0
+
+    return returnVal
+
+ra_scraper = RoomAvailabilityScraper()
+availability_data = ra_scraper.scrape_room_availability(31)
