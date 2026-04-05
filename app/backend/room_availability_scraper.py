@@ -57,21 +57,20 @@ class RoomAvailabilityScraper:
 
     # Apparently, requesting more than 31 days of room booking data causes an error. To handle this, then, I will split requests for more than 31 days of data into multiple
     def scrape_room_availability(self, num_days):
-        result = {}
+        result = []
         startDay = datetime.now()
         endDay = datetime.now()
         while num_days > 0:
-            if num_days > self.maxRequestableDays:
-                endDay = endDay + timedelta(days=self.maxRequestableDays)
-            else:
-                endDay = endDay + timedelta(days=num_days)
+            daysRequested = min(num_days, self.maxRequestableDays)
+            endDay += timedelta(days=daysRequested)
+            self.data["start"] = startDay.strftime("%Y-%m-%d")
+            self.data["end"] = endDay.strftime("%Y-%m-%d")
+            res = requests.post(self.url, headers=self.headers, data=self.data)
+            result.extend(res.json()["slots"])
+            startDay = endDay
+            num_days -= daysRequested
 
-            self.data["start"] = datetime.now().strftime("%Y-%m-%d")
-            self.data["end"] = (datetime.now() + timedelta(days=num_days)).strftime("%Y-%m-%d")
-
-        res = requests.post(self.url, headers=self.headers, data=self.data)
-
-        return res.json()["slots"]
+        return result
 
     # Filters availability data to only those bookings that overlap with the current time. Future bookings can fluctuate, so this should give the most accurate picture of room usage
     def get_current_bookings(self, availability_data):
@@ -128,4 +127,5 @@ def get_days_until_semester_end():
     return returnVal
 
 ra_scraper = RoomAvailabilityScraper()
-availability_data = ra_scraper.scrape_room_availability(31)
+availability_data = ra_scraper.scrape_room_availability(get_days_until_semester_end())
+ra_scraper.send_to_db(availability_data)
