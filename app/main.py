@@ -1,6 +1,7 @@
 import streamlit as st
 from app.backend.room_availability_scraper import *
 
-scrape_hourly()
+# scrape_hourly()
 
-st.switch_page("pages/home_page.py")
+# When login is finished through google, the main script is rerun. Thus, the target should be the login page
+st.switch_page("pages/login_page.py")

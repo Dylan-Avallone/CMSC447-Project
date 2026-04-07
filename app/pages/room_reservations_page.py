@@ -8,8 +8,17 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
 from app.backend.get_db import get_db
 
+db = get_db()
+
 if not st.user.is_logged_in:
     st.warning("You must be signed in to access this page.")
+    if st.button("Go to Login"):
+        st.switch_page("pages/login_page.py")
+    if st.button("Back to Home", key="security"):
+            st.switch_page("pages/home_page.py")
+    st.stop()
+elif not db.has_user(st.user.to_dict()["email"]):
+    st.warning("You don't have access to this page.")
     if st.button("Go to Login"):
         st.switch_page("pages/login_page.py")
     if st.button("Back to Home", key="security"):
@@ -21,8 +30,6 @@ st.set_page_config(
     page_icon="x",
     layout="wide"
 )
-
-db = get_db()
 
 #title
 st.title("Room Reservations")
@@ -152,39 +159,68 @@ st.subheader("Grouped Views")
 tab1, tab2, tab3 = st.tabs(["Today", "Upcoming", "Past"])
 
 with tab1:
-    today_df = df[df["Period"] == "Today"].sort_values(by=["Start Time", "Room"])
+    today_df = df[df["Period"] == "Today"].sort_values(by=["Start Time", "Room Location"])
     if today_df.empty:
         st.info("No reservations scheduled for today.")
     else:
         st.dataframe(
             today_df[
-                ["Start Time", "End Time", "Room", "Reserved By", "Purpose", "Status"]
+                [
+                    "Reservation ID",
+                    "Purpose",
+                    "Start Time",
+                    "End Time",
+                    "Notes",
+                    "Created At",
+                    "Reserved By",
+                    "Room Location"
+                ]
             ],
             use_container_width=True,
             hide_index=True
         )
 
 with tab2:
-    future_df = df[df["Period"] == "Future"].sort_values(by=["Date", "Start Time"])
+    future_df = df[df["Period"] == "Future"].sort_values(by=["Reservation Date", "Start Time"])
     if future_df.empty:
         st.info("No upcoming reservations.")
     else:
         st.dataframe(
             future_df[
-                ["Date", "Start Time", "End Time", "Room", "Reserved By", "Purpose", "Status"]
+                [
+                    "Reservation ID",
+                    "Purpose",
+                    "Reservation Date",
+                    "Start Time",
+                    "End Time",
+                    "Notes",
+                    "Created At",
+                    "Reserved By",
+                    "Room Location"
+                ]
             ],
             use_container_width=True,
             hide_index=True
         )
 
 with tab3:
-    past_df = df[df["Period"] == "Past"].sort_values(by=["Date", "Start Time"], ascending=[False, False])
+    past_df = df[df["Period"] == "Past"].sort_values(by=["Reservation Date", "Start Time"], ascending=[False, False])
     if past_df.empty:
         st.info("No past reservations found.")
     else:
         st.dataframe(
             past_df[
-                ["Date", "Start Time", "End Time", "Room", "Reserved By", "Purpose", "Status"]
+                [
+                    "Reservation ID",
+                    "Purpose",
+                    "Reservation Date",
+                    "Start Time",
+                    "End Time",
+                    "Notes",
+                    "Created At",
+                    "Reserved By",
+                    "Room Location"
+                ]
             ],
             use_container_width=True,
             hide_index=True

@@ -1,8 +1,15 @@
 import streamlit as st
+from app.backend.get_db import get_db
 
 st.set_page_config(page_title="Login", page_icon="x", layout="centered")
 
-#title
+# User tried to log in but is not authorized
+if "invalid_user" in st.session_state:
+    if st.session_state["invalid_user"]:
+        st.error("You are not authorized to access the dashboard")
+        st.session_state["displayed_error"] = True
+
+# Title
 st.title("Login")
 st.caption("Sign in with your UMBC Google account.")
 
@@ -28,15 +35,16 @@ if not st.user.is_logged_in:
         st.login("google")
     st.stop()
 
+db = get_db()
 email = st.user.get("email", "")
 name = st.user.get("name", "User")
 
-# umbc only
-if not email.lower().endswith("@umbc.edu"):
-    st.error("Access is restricted to UMBC Google accounts.")
-    if st.button("Log out", use_container_width=True):
-        st.logout()
-    st.stop()
+# UMBC only
+if not db.has_user(email):
+    st.session_state["invalid_user"] = True
+    if "displayed_error" in st.session_state:
+        if not st.session_state["displayed_error"]:
+            st.rerun()
 
 st.success(f"Signed in as {name}")
 st.write(f"Email: {email}")

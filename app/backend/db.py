@@ -54,18 +54,18 @@ class DB:
             except sqlite3.IntegrityError: # Also ignore duplicates here, rather than inserting them again
                 pass
 
-    def check_credentials(self, email, password):
+    def has_user(self, email):
         with sqlite3.connect(self.dbpath) as connection:
             cursor = connection.cursor()
             cursor.execute("SELECT * FROM Users WHERE user_email = ?", (email,))
             result = cursor.fetchone()
-            returnval = None
+            returnVal = None
             if result is None:
-                returnval = False
+                returnVal = False
             else:
-                returnval = bcrypt.checkpw(password.encode(), result[3])
+                returnVal = True
 
-        return bool(returnval)
+        return returnVal
 
     def get_printable_table(self, table):
         with sqlite3.connect(self.dbpath) as connection:

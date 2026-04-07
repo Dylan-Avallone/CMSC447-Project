@@ -1,8 +1,8 @@
--- First two tables enumerate allowed values for the status of a room/book/printer, and the type of a room
 CREATE TABLE IF NOT EXISTS Users (
 	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_name VARCHAR(100) NOT NULL,
-    user_email VARCHAR(100) UNIQUE
+    user_email VARCHAR(100) UNIQUE,
+    user_role TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Departments (

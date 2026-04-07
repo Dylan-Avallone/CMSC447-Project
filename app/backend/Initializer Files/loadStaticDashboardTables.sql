@@ -1,4 +1,7 @@
--- Allowed values for status fields in room, printer, book, and type fields in room and feedback
+INSERT INTO Users (user_name, user_email, user_role)
+VALUES
+    ('Ryan', 'ryano3@umbc.edu', 'admin');
+
 INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
 VALUES
     ('Computer Science', 'CS', 'Dr. Mohamed Younis', 'ITE 325'),
