@@ -23,9 +23,9 @@ if hasattr(st.user, "is_logged_in") and st.user.is_logged_in:
     email = getattr(st.user, "email", "") or "No email available"
     picture = getattr(st.user, "picture", None)
 
-    if email == "ethanj3@umbc.edu".lower():
-        st.title("Welcome Drex")
-        st.image(ASSETS_DIR / "important.jpg", width=800)
+    #if email == "ethanj3@umbc.edu".lower():
+     #   st.title("Welcome Drex")
+     #   st.image(ASSETS_DIR / "important.jpg", width=800)
 
 
     with st.container():
