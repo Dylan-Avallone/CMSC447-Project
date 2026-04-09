@@ -47,5 +47,44 @@ VALUES
 	('Printer 4', 'available'),
 	('Printer 5', 'available');
     
-    
+-- Generate a list of 100 fake students
+
+DELIMITER $$
+
+CREATE PROCEDURE GenerateStudents()
+BEGIN
+    DECLARE i INT DEFAULT 1;
+
+    WHILE i <= 100 DO
+
+        -- create students
+        INSERT INTO Students (studentId)
+        VALUES (CONCAT('student', i));
+
+        -- generate times
+        SET @enter_time = DATE_ADD(
+            '2026-04-09 08:00:00',
+            INTERVAL FLOOR(RAND() * 300) MINUTE
+        );
+
+        SET @exit_time = DATE_ADD(
+            @enter_time,
+            INTERVAL FLOOR(60 + RAND() * 180) MINUTE
+        );
+
+        -- insert gate events
+        INSERT INTO GateEvents (frontgateid, studentId, eventType, eventTime)
+        VALUES 
+            ('GATE1', CONCAT('student', i), 'ENTER', @enter_time),
+            ('GATE1', CONCAT('student', i), 'EXIT', @exit_time);
+
+        SET i = i + 1;
+
+    END WHILE;
+END$$
+
+DELIMITER ;
+
+CALL GenerateStudents();
+
 
