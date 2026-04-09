@@ -4,6 +4,20 @@ CREATE TABLE Users (
     user_email VARCHAR(100) UNIQUE
     );
 
+CREATE TABLE Students (
+    studentId VARCHAR(100) PRIMARY KEY
+);
+
+CREATE TABLE GateEvents (
+    eventId INT AUTO_INCREMENT PRIMARY KEY,
+    frontgateid VARCHAR(100),
+    studentId VARCHAR(100),
+    eventType ENUM('ENTER', 'EXIT'),
+    eventTime DATETIME NOT NULL,
+    FOREIGN KEY (studentId) REFERENCES Students(studentId),
+    INDEX (eventTime)
+);
+
 CREATE TABLE Departments (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
     department_name VARCHAR(100) NOT NULL,
@@ -21,11 +35,14 @@ CREATE TABLE Room (
 );
 
 CREATE TABLE RoomReserved (
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    room_id INT,
     reservation_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     user_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (room_id) REFERENCES Room(reservation_id)
 );
 
 CREATE TABLE BookLocator (
@@ -46,6 +63,7 @@ CREATE TABLE Printer(
     );
 
 CREATE TABLE PrinterUsage (
+    usage_id INT AUTO_INCREMENT PRIMARY KEY,
     pages_printed INT,
     print_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INT,
