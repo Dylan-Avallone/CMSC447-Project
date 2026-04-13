@@ -10,7 +10,7 @@ sys.path.append(str(PROJECT_ROOT))
 
 from app.backend.get_db import get_db
 
-st.set_page_config(page_title="Library Traffic", page_icon="🚪", layout="wide")
+st.set_page_config(page_title="Library Traffic", page_icon="X", layout="wide")
 
 if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
     st.warning("You must be signed in to access this page.")
@@ -28,6 +28,7 @@ if st.button("Back to Home"):
 st.title("Library Traffic")
 st.caption("Gate counter analytics for library entrance volume and peak usage patterns.")
 
+
 rows = db.get_library_entry_log()
 
 df = pd.DataFrame(rows, columns=["Entry ID", "Entry Time", "Entry Count"])
@@ -41,6 +42,25 @@ df["Date"] = df["Entry Time"].dt.date
 df["Hour"] = df["Entry Time"].dt.strftime("%I:%M %p")
 df["Weekday"] = df["Entry Time"].dt.day_name()
 
+
+
+st.subheader("Hourly Traffic by Selected Day")
+
+available_dates = sorted(df["Date"].unique())
+selected_date = st.selectbox("Select a day", available_dates)
+
+selected_day_df = df[df["Date"] == selected_date].copy()
+selected_day_df = selected_day_df.sort_values("Entry Time")
+
+line_df = selected_day_df[["Hour", "Entry Count"]].set_index("Hour")
+
+st.line_chart(line_df)
+
+
+
+
+
+
 today_df = df[df["Date"] == pd.Timestamp.today().date()]
 
 entries_today = int(today_df["Entry Count"].sum()) if not today_df.empty else 0
@@ -48,15 +68,12 @@ avg_hourly = round(df["Entry Count"].mean(), 1)
 
 if not today_df.empty:
     peak_row = today_df.loc[today_df["Entry Count"].idxmax()]
-    peak_hour_today = peak_row["Hour"]
     peak_entries_today = int(peak_row["Entry Count"])
 else:
-    peak_hour_today = "N/A"
     peak_entries_today = 0
 
 m1, m2, m3 = st.columns(3)
 m1.metric("Entries Today", entries_today)
-m2.metric("Peak Hour Today", peak_hour_today)
 m3.metric("Average Hourly Entries", avg_hourly)
 
 st.subheader("Daily Totals")
@@ -70,7 +87,4 @@ st.dataframe(
     hide_index=True
 )
 
-st.subheader("Peak Time by Day")
-peak_by_day = df.loc[df.groupby("Date")["Entry Count"].idxmax()][["Date", "Hour", "Entry Count"]]
-peak_by_day = peak_by_day.rename(columns={"Hour": "Peak Hour", "Entry Count": "Peak Entries"})
-st.dataframe(peak_by_day, use_container_width=True, hide_index=True)
+
