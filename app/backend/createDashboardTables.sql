@@ -45,29 +45,30 @@ CREATE TABLE IF NOT EXISTS BookLocator (
     availability_status VARCHAR(20) DEFAULT 'available'
 );
 
+
+
 CREATE TABLE IF NOT EXISTS Printer (
     printer_id INTEGER PRIMARY KEY AUTOINCREMENT,
     printer_name VARCHAR(50) NOT NULL,
-    curr_status VARCHAR(30) DEFAULT 'available',
-    user_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    printer_location VARCHAR(100),
+    printer_model VARCHAR(100),
+    curr_status VARCHAR(30) DEFAULT 'Available',
+    toner_level INT,
+    paper_level INT,
+    last_maintenance DATE
 );
 
 CREATE TABLE IF NOT EXISTS PrinterUsage (
     usage_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pages_printed INT,
+    pages_printed INT NOT NULL,
     print_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    user_id INT,
-    printer_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    job_status VARCHAR(30) DEFAULT 'Completed',
+    printer_id INT NOT NULL,
     FOREIGN KEY (printer_id) REFERENCES Printer(printer_id)
 );
 
-CREATE TABLE IF NOT EXISTS FeedbackForms (
-    form_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    form_type VARCHAR(30) DEFAULT 'bug report',
-    form_content VARCHAR(1000) NOT NULL,
-    submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    user_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+CREATE TABLE IF NOT EXISTS LibraryEntryLog (
+    entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_time DATETIME NOT NULL,
+    entry_count INT NOT NULL
 );
