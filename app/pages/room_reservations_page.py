@@ -27,13 +27,15 @@ st.set_page_config(
 
 db = get_db()
 
+#home button
+if st.button("Back to Home"):
+    st.switch_page("pages/home_page.py")
+
 #title
 st.title("Room Reservations")
 st.caption("Monitor past, current, and upcoming reservations across library rooms.")
 
-#home button
-if st.button("Back to Home"):
-    st.switch_page("pages/home_page.py")
+
 
 # -----------------------------
 # Data loading

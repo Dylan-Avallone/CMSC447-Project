@@ -72,3 +72,11 @@ CREATE TABLE IF NOT EXISTS LibraryEntryLog (
     entry_time DATETIME NOT NULL,
     entry_count INT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS FeedbackForms (
+    form_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    form_type VARCHAR(30) DEFAULT 'bug report',
+    form_content VARCHAR(1000) NOT NULL,
+    submission_time DATETIME DEFAULT CURRENT_TIMESTAMP
+  
+);

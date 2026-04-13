@@ -7,13 +7,14 @@ from app.backend.get_db import get_db
 
 db = get_db()
 
+#home button
+if st.button("Back to Home"):
+    st.switch_page("pages/home_page.py")
+
 #title
 st.title("Feedback")
 st.caption("Having issues; recommendations?")
 
-#home button
-if st.button("Back to Home"):
-    st.switch_page("pages/home_page.py")
 
 option = st.selectbox(
     "Select an option",

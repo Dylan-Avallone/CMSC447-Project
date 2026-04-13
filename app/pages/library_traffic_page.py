@@ -76,15 +76,26 @@ m1, m2, m3 = st.columns(3)
 m1.metric("Entries Today", entries_today)
 m3.metric("Average Hourly Entries", avg_hourly)
 
+
+
 st.subheader("Daily Totals")
-daily_totals = df.groupby("Date", as_index=False)["Entry Count"].sum()
+daily_totals = df.groupby(["Date", "Weekday"], as_index=False)["Entry Count"].sum()
 st.dataframe(daily_totals, use_container_width=True, hide_index=True)
 
-st.subheader("Hourly Traffic Log")
+st.subheader("Hourly Traffic Log This Week")
+
+log_selected_date = st.selectbox(
+    "Select a day for hourly log",
+    available_dates,
+    index=available_dates.index(selected_date),
+    format_func=lambda d: d.strftime("%A, %B %d, %Y")
+)
+
+log_day_df = df[df["Date"] == log_selected_date].copy()
+log_day_df = log_day_df.sort_values("Entry Time")
+
 st.dataframe(
-    df[["Date", "Hour", "Weekday", "Entry Count"]],
+    log_day_df[["Hour", "Entry Count"]],
     use_container_width=True,
     hide_index=True
 )
-
-

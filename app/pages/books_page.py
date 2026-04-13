@@ -22,13 +22,16 @@ st.set_page_config(page_title="Book Management", page_icon="x", layout="wide")
 
 db = get_db()
 
+#home button
+if st.button("Back to Home"):
+    st.switch_page("pages/home_page.py")
+
+
 #title
 st.title("Book Management")
 st.caption("Search, filter, and review the library catalog.")
 
-#home button
-if st.button("Back to Home"):
-    st.switch_page("pages/home_page.py")
+
 
 
 #rows from book table

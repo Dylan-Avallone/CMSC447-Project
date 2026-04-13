@@ -45,15 +45,19 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-top_left, top_right = st.columns([1, 8])
+#home button
+if st.button("Back to Home"):
+    st.switch_page("pages/home_page.py")
 
-with top_left:
-    if st.button("← Back", use_container_width=True):
-        st.switch_page("pages/home_page.py")
 
-with top_right:
-    st.title("Printer Management")
-    st.caption("Monitor printer availability, maintenance, supply levels, and recent usage.")
+
+#title
+st.title("Printer Management")
+st.caption("Monitor printer availability, maintenance, supply levels, and recent usage.")
+
+
+
+
 
 #-+___________________________-
 # Load data

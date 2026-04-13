@@ -41,6 +41,7 @@ st.markdown(
         padding: 1.2rem 1.5rem;
         border-radius: 16px;
         border-left: 8px solid #fdb515;
+        border-right 8px solid #fdb515
         box-shadow: 0 4px 14px rgba(0,0,0,0.10);
         margin-bottom: 1rem;
     }
@@ -66,6 +67,7 @@ st.markdown(
         box-shadow: 0 3px 12px rgba(0,0,0,0.05);
         margin-bottom: 1rem;
     }
+    
 
     .card-title {
         font-size: 1.05rem;
@@ -109,7 +111,7 @@ st.markdown(
 # -----------------------------
 # Top banner
 # -----------------------------
-banner_left, banner_right = st.columns([8, 1])
+banner_left, spacer, banner_right = st.columns([8,.5, 1])
 
 with banner_left:
     st.markdown(
@@ -124,7 +126,11 @@ with banner_left:
         unsafe_allow_html=True
     )
 
+with spacer:
+    st.write("")
+
 with banner_right:
+    
     if LOGO_PATH.exists():
         st.image(LOGO_PATH, width=95)
 
@@ -135,7 +141,7 @@ with banner_right:
 #st.markdown('<div class="section-card">', unsafe_allow_html=True)
 
 
-left, right = st.columns([1.2, 1])
+left, spacer, right = st.columns([1.2, .2, 1])
 
 with left:
    
@@ -164,6 +170,9 @@ with left:
             st.switch_page("pages/login_page.py")
 
     st.markdown('</div>', unsafe_allow_html=True)
+
+with spacer:
+    st.write("")
 
 with right:
     if is_logged_in:
@@ -197,12 +206,6 @@ with right:
 # Metrics
 # 
 #st.markdown("## Summary")
-if is_logged_in:
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Books Cataloged", "35")
-    m2.metric("Reservations", "10")
-    m3.metric("Pending Requests", "2")
-    m4.metric("Printers Active", "5")
 
 st.markdown("## Dashboard Navigation")
 
