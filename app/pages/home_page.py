@@ -142,6 +142,7 @@ with left:
     st.markdown('<div class="card-title">Account</div>', unsafe_allow_html=True)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 with right:
     st.image(ASSETS_DIR / "umbclogo.png", width=100)
 
@@ -200,6 +201,8 @@ with col2:
 
     if st.user.is_logged_in is True:
 =======
+=======
+>>>>>>> streamlit-testing
     if is_logged_in:
         st.markdown(
             f"""
@@ -212,7 +215,10 @@ with col2:
             unsafe_allow_html=True
         )
         st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+<<<<<<< HEAD
 >>>>>>> 8c013d6 (updated UI added 2 dashboards)
+=======
+>>>>>>> streamlit-testing
         if st.button("Log out", use_container_width=True):
             st.logout()
     else:
