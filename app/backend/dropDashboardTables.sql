@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS PrinterUsage;
+DROP TABLE IF EXISTS LibraryEntryLog;
 DROP TABLE IF EXISTS FeedbackForms;
 DROP TABLE IF EXISTS Printer;
 DROP TABLE IF EXISTS RoomReservations;

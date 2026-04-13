@@ -91,3 +91,105 @@ class DB:
         """
         return self.execute_command(query, ())
         
+
+    def get_printers(self):
+        query = """
+        SELECT
+            printer_id,
+            printer_name,
+            printer_location,
+            printer_model,
+            curr_status,
+            toner_level,
+            paper_level,
+            last_maintenance
+        FROM Printer
+        ORDER BY printer_name ASC
+        """
+        return self.execute_command(query, ())
+    
+
+    def get_printer_usage(self):
+        query = """
+        SELECT
+            pu.usage_id,
+            p.printer_name,
+            p.printer_location,
+            pu.pages_printed,
+            pu.job_status,
+            pu.print_time
+        FROM PrinterUsage pu
+        JOIN Printer p ON pu.printer_id = p.printer_id
+        ORDER BY pu.print_time DESC
+        """
+        return self.execute_command(query, ())     
+    
+
+    def get_printer_usage_summary(self):
+        query = """
+        SELECT
+            p.printer_name,
+            COUNT(pu.usage_id) AS total_jobs,
+            COALESCE(SUM(pu.pages_printed), 0) AS total_pages
+        FROM Printer p
+        LEFT JOIN PrinterUsage pu ON p.printer_id = pu.printer_id
+        GROUP BY p.printer_id, p.printer_name
+        ORDER BY total_pages DESC
+        """
+        return self.execute_command(query, ()) 
+    
+    #-----
+    #home page system overview
+    def get_pending_reservations_count(self):
+        query = """
+        SELECT COUNT(*)
+        FROM RoomReservations
+        WHERE status = 'Pending'
+        """
+        result = self.execute_command(query, ())
+        return result[0][0] if result else 0
+
+    def get_printers_needing_attention_count(self):
+        query = """
+        SELECT COUNT(*)
+        FROM Printer
+        WHERE toner_level <= 20
+        OR paper_level <= 20
+        OR curr_status IN ('Offline', 'Maintenance')
+        """
+        result = self.execute_command(query, ())
+        return result[0][0] if result else 0
+    
+
+#---
+#gate counter
+    def get_library_entry_log(self):
+        query = """
+        SELECT
+            entry_id,
+            entry_time,
+            entry_count
+        FROM LibraryEntryLog
+        ORDER BY entry_time ASC
+        """
+        return self.execute_command(query, ())
+
+    def get_total_entries_today(self):
+        query = """
+        SELECT COALESCE(SUM(entry_count), 0)
+        FROM LibraryEntryLog
+        WHERE DATE(entry_time) = DATE('now')
+        """
+        result = self.execute_command(query, ())
+        return result[0][0] if result else 0
+
+    def get_peak_hour_today(self):
+        query = """
+        SELECT entry_time, entry_count
+        FROM LibraryEntryLog
+        WHERE DATE(entry_time) = DATE('now')
+        ORDER BY entry_count DESC
+        LIMIT 1
+        """
+        result = self.execute_command(query, ())
+        return result[0] if result else None
