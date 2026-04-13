@@ -141,68 +141,6 @@ with left:
    
     st.markdown('<div class="card-title">Account</div>', unsafe_allow_html=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-with right:
-    st.image(ASSETS_DIR / "umbclogo.png", width=100)
-
-
-#is user logged into umbc
-if hasattr(st.user, "is_logged_in") and st.user.is_logged_in:
-    name = getattr(st.user, "name", "") or "User"
-    email = getattr(st.user, "email", "") or "No email available"
-    picture = getattr(st.user, "picture", None)
-
-    #if email == "ethanj3@umbc.edu".lower():
-     #   st.title("Welcome Drex")
-     #   st.image(ASSETS_DIR / "important.jpg", width=800)
-
-
-    with st.container():
-        
-        left, right = st.columns([4, 2])
-
-        with left:
-            st.markdown("### Account")
-            st.markdown(f"**Welcome, {name}**")
-            st.write(f"**Email:** {email}")
-            st.write("You are authenticated through Google.")
-
-        with right:
-            st.image(ASSETS_DIR / "library1.jpg", width=100000)
-
-       
-
-else:
-    st.info("Please sign in to access UMBC dashboard features.")
-
-st.markdown("---")
-st.subheader("Navigation")
-
-col1, col2 = st.columns(2)
-
-with col1:
-
-    if st.user.is_logged_in is False:
-        if st.button("Login", use_container_width=True):
-            st.switch_page("pages/login_page.py")
-
-    if st.user.is_logged_in is True:        
-        if st.button("Books Page", use_container_width=True) and st.user.is_logged_in:
-            st.switch_page("pages/books_page.py")
-
-    if st.user.is_logged_in is True:
-        if st.button("Room Reservations", use_container_width=True):
-            st.switch_page("pages/room_reservations_page.py")
-
-with col2:
-    if st.button("Feedback Form", use_container_width=True):
-        st.switch_page("pages/feedback_page.py")
-
-    if st.user.is_logged_in is True:
-=======
-=======
->>>>>>> streamlit-testing
     if is_logged_in:
         st.markdown(
             f"""
@@ -215,10 +153,6 @@ with col2:
             unsafe_allow_html=True
         )
         st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
-<<<<<<< HEAD
->>>>>>> 8c013d6 (updated UI added 2 dashboards)
-=======
->>>>>>> streamlit-testing
         if st.button("Log out", use_container_width=True):
             st.logout()
     else:
