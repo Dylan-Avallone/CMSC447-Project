@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS Users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_name VARCHAR(100) NOT NULL,
     user_email VARCHAR(100) UNIQUE,
-    user_password VARCHAR(100)
+    user_role VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Departments (

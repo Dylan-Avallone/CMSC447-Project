@@ -1,6 +1,7 @@
 import sqlite3
 import os
-
+from .user import User
+from email_validator import validate_email, EmailNotValidError
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 class DB:
@@ -31,11 +32,35 @@ class DB:
             cursor = connection.cursor()
             cursor.execute("INSERT INTO FeedbackForms (form_type, form_content) VALUES (?, ?)", (form_type, form_content))
 
-    def add_user(self, username, email, password):
+    def add_user(self, user: User):
         with self.connection as connection:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO Users (user_name, user_email, user_password) VALUES (?, ?, ?)", (username, email, password))
+            cursor.execute("INSERT INTO Users (user_name, user_email, user_role) VALUES (?, ?, ?)", (user.Username, user.Email, user.Role))
             connection.commit()
+
+    def get_user(self, email) -> User:
+        with self.connection as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM Users WHERE user_email = ?", (email,))
+            result = cursor.fetchone()
+            print(result)
+            return User(result[1], result[2], result[3])
+
+    def remove_user(self, user:User):
+        with self.connection as connection:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM Users WHERE user_id = ?", (user.ID,))
+
+    def edit_user(self, user:User):
+        with self.connection as connection:
+            cursor = connection.cursor()
+            if user.Email is not None:
+                pass
+            if user.Username is not None:
+                pass
+            if user.Role is not None:
+                pass
+            cursor.execute()
 
     def check_credentials(self, email, password):
         with self.connection as connection:

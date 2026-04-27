@@ -294,4 +294,15 @@ with c5:
         if st.button("Open Feedback Page", use_container_width=True, key="feedback_btn"):
             st.switch_page("pages/feedback_page.py")
 
-    
+if is_logged_in:
+    if db.get_user(st.user.email).role == "admin":
+        with c6:
+            with st.container():
+                st.markdown("### Admin Controls")
+                st.markdown(
+                    '<div class="muted">Add and remove users, change permissions</div>',
+                    unsafe_allow_html=True
+                )
+                st.markdown('</div>', unsafe_allow_html=True)
+                if st.button("Open Admin Controls", use_container_width=True, key="admin_btn"):
+                    st.switch_page("pages/admin_controls_page.py")

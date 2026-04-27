@@ -1,10 +1,10 @@
-INSERT INTO Users (user_name, user_email, user_password)
+INSERT INTO Users (user_name, user_email, user_role)
 VALUES
-    ('Ryan', 'ryano3@umbc.edu', 'password'),
-    ('Ava Johnson', 'avaj@umbc.edu', 'password'),
-    ('Marcus Lee', 'mlee2@umbc.edu', 'password'),
-    ('Sophia Patel', 'spatel4@umbc.edu', 'password'),
-    ('Daniel Kim', 'dkim7@umbc.edu', 'password');
+    ('Ryan', 'ryano3@umbc.edu', 'admin'),
+    ('Ava Johnson', 'avaj@umbc.edu', 'user'),
+    ('Marcus Lee', 'mlee2@umbc.edu', 'user'),
+    ('Sophia Patel', 'spatel4@umbc.edu', 'user'),
+    ('Daniel Kim', 'dkim7@umbc.edu', 'user');
 
 INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
 VALUES
