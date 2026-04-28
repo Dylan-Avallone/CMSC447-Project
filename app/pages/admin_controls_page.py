@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import pandas as pd
 from app.backend.get_db import get_db
-from app.backend.user import User
+from app.backend.table_object_classes.user import User
 
 PAGE_DIR = Path(__file__).resolve().parent
 APP_DIR = PAGE_DIR.parent

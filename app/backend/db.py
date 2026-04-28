@@ -1,75 +1,22 @@
 import sqlite3
 import os
-from .user import User
-from email_validator import validate_email, EmailNotValidError
+from app.backend.table_object_classes.user import User
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 class DB:
-    feedback_limit = 1000
     def __init__(self):
         self.filename = os.path.join(BASE_DIR, "library_data.db")
         self.connection = sqlite3.connect(self.filename, check_same_thread=False)
         self.load_db(self.filename, ['dropDashboardTables.sql',
                                      'createDashboardTables.sql',
                                      'loadStaticDashboardTables.sql'])
-     
 
     def load_db(self, dbname, sqlfiles):
         with self.connection as connection:
             for file in sqlfiles:
                 with open(os.path.join(BASE_DIR, file), 'r') as f:
                     sqlfile = f.read()
-
-                sqlCommands = sqlfile.split(';')
-                for command in sqlCommands:
-                    command = command.strip()
-                    if not command:
-                        continue
-                    connection.cursor().execute(command)
-
-    def add_feedback(self, form_type, form_content):
-        with self.connection as connection:
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO FeedbackForms (form_type, form_content) VALUES (?, ?)", (form_type, form_content))
-
-    def add_user(self, user: User):
-        with self.connection as connection:
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO Users (user_name, user_email, user_role) VALUES (?, ?, ?)", (user.Username, user.Email, user.Role))
-            connection.commit()
-
-    def get_user(self, email) -> User:
-        with self.connection as connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM Users WHERE user_email = ?", (email,))
-            result = cursor.fetchone()
-            print(result)
-            return User(result[1], result[2], result[3])
-
-    def remove_user(self, user:User):
-        with self.connection as connection:
-            cursor = connection.cursor()
-            cursor.execute("DELETE FROM Users WHERE user_id = ?", (user.ID,))
-
-    def edit_user(self, user:User):
-        with self.connection as connection:
-            cursor = connection.cursor()
-            if user.Email is not None:
-                pass
-            if user.Username is not None:
-                pass
-            if user.Role is not None:
-                pass
-            cursor.execute()
-
-    def check_credentials(self, email, password):
-        with self.connection as connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT EXISTS(SELECT 1 FROM Users WHERE user_email = ? AND user_password = ?)", (email, password))
-            returnval = cursor.fetchone()[0]
-
-        return bool(returnval)
-
+                    connection.executescript(sqlfile)
 
     def get_printable_table(self, table):
         with self.connection as connection:
@@ -82,9 +29,19 @@ class DB:
         with self.connection as connection:
             cursor = connection.cursor()
             cursor.execute(command, params)
-            result = cursor.fetchall()
 
-        return result
+        return cursor
+
+    def get_one(self, command, params):
+        return self.execute_command(command, params).fetchone()
+
+    def get_all(self, command, params):
+        return self.execute_command(command, params).fetchall()
+
+    def add_feedback(self, form_type, form_content):
+        with self.connection as connection:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO FeedbackForms (form_type, form_content) VALUES (?, ?)", (form_type, form_content))
     
     def get_room_reservations(self):
         query = """
@@ -163,9 +120,7 @@ class DB:
         ORDER BY total_pages DESC
         """
         return self.execute_command(query, ()) 
-    
-    #-----
-    #home page system overview
+
     def get_pending_reservations_count(self):
         query = """
         SELECT COUNT(*)
@@ -185,10 +140,7 @@ class DB:
         """
         result = self.execute_command(query, ())
         return result[0][0] if result else 0
-    
 
-#---
-#gate counter
     def get_library_entry_log(self):
         query = """
         SELECT
@@ -219,3 +171,50 @@ class DB:
         """
         result = self.execute_command(query, ())
         return result[0] if result else None
+
+
+
+class DBUserFunctions:
+    def __init__(self, db:DB):
+        self.DB = db
+
+    def add_user(self, user: User):
+        command = "INSERT INTO Users (user_name, user_email, user_role) VALUES (?, ?, ?)"
+        params = (user.Username, user.Email, user.Role)
+        self.DB.execute_command(command, params)
+
+    def get_user(self, email) -> User:
+        command = "SELECT * FROM Users WHERE user_email = ?"
+        params = (email,)
+        result = self.DB.get_one(command, params)
+
+        if result:
+            return User(id=result[0], username=result[1], email=result[2], role=result[3])
+        else:
+            return None
+
+    def remove_user(self, user:User):
+        command = "DELETE FROM Users WHERE user_id = ?"
+        params = (user.ID,)
+        self.DB.execute_command(command, params)
+
+    def edit_user(self, user:User):
+        updates = []
+        params = []
+
+        if user.Username is not None:
+            updates.append("user_name = ?")
+            params.append(user.Username)
+        if user.Email is not None:
+            updates.append("user_email = ?")
+            params.append(user.Email)
+        if user.Role is not None:
+            updates.append("user_role = ?")
+            params.append(user.Role)
+
+        if not updates:
+            return
+
+        params.append(user.ID)
+        command = f"UPDATE Users SET {', '.join(updates)} WHERE user_id = ?"
+        self.DB.execute_command(command, params)
