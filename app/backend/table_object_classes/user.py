@@ -3,11 +3,11 @@ from typing import ClassVar
 
 @dataclass
 class User:
-    ROLES: ClassVar[list]= ["admin", "user", "developer"]
+    ROLES: ClassVar[list] = ["admin", "user", "developer"]
     id: int
-    username: str
-    email: str
-    role: str
+    username: str = None
+    email: str = None
+    role: str = None
 
     def __post_init__(self):
         if self.role not in self.ROLES:

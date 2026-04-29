@@ -295,7 +295,8 @@ with c5:
             st.switch_page("pages/feedback_page.py")
 
 if is_logged_in:
-    if db.get_user(st.user.email).role == "admin":
+    user_role = db.get_user(st.user.email).role
+    if user_role == "admin" or user_role == "developer":
         with c6:
             with st.container():
                 st.markdown("### Admin Controls")

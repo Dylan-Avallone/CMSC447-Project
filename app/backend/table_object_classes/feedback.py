@@ -18,4 +18,4 @@ class Feedback:
             errors.append(ValueError("Feedback content too long"))
 
         if errors:
-            raise ExceptionGroup(errors)
+            raise ExceptionGroup("Validation failed: ", errors)
