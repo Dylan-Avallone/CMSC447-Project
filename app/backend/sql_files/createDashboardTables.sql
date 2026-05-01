@@ -18,20 +18,23 @@ CREATE TABLE IF NOT EXISTS Room (
     room_name VARCHAR(50) NOT NULL,
     room_location VARCHAR(100),
     capacity INT,
-    room_type VARCHAR(50)
+    description VARCHAR(250),
+    wd_avblty_start TIME,
+    wd_avblty_end TIME,
+    sat_avblty_start TIME,
+    sat_avblty_end TIME,
+    sun_avblty_start TIME,
+    sun_avblty_end TIME
 );
 
 CREATE TABLE IF NOT EXISTS RoomReservations (
     reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
     room_id INT NOT NULL,
-    user_id INT NOT NULL,
-    purpose VARCHAR(255) NOT NULL,
     reservation_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    status VARCHAR(20) DEFAULT 'Approved',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    notes VARCHAR(500),
+    is_canceled INT DEFAULT 0,
     FOREIGN KEY (room_id) REFERENCES Room(room_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );

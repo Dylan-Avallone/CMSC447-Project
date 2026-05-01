@@ -21,17 +21,54 @@ VALUES
 	('Psychology', 'PSYC', 'Dr. Lira Yoon', 'MP 312'),
 	('Sociology, Anthropology, and Public Health', 'SAPH', 'Dr. Andrea Kalfoglou', 'PUP 233');
     
-INSERT INTO Room (room_name, room_location, capacity, room_type)
+INSERT INTO Room (room_name, room_location, capacity, description, wd_avblty_start, wd_avblty_end, sat_avblty_start, sat_avblty_end, sun_avblty_start, sun_avblty_end)
 VALUES
+/*
     ('Library Study Room A', 'First Floor - East Wing', 4, 'Study Room'),
     ('Library Study Room B', 'First Floor - East Wing', 6, 'Study Room'),
     ('Library Collaboration Room 1', 'Second Floor - North Wing', 8, 'Collaboration Room'),
     ('Library Collaboration Room 2', 'Second Floor - North Wing', 10, 'Collaboration Room'),
     ('Library Conference Room', 'Third Floor - Admin Area', 12, 'Conference Room'),
     ('Digital Media Lab', 'Second Floor - Technology Center', 16, 'Lab');
+*/
+    ('Collaboration Room', '368', 4,
+        'This room is available to UMBC students, faculty, and staff. It contains a small conference table and a smart TV with Chromecast, which allows a laptop, tablet or smartphone to stream content to the screen.',
+        '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Presentation Practice Room', '257', 8,
+        'This room has been set up for students to practice giving presentations, speeches, etc. Bring your flash drive to plug into our one-button recording system - when you're finished, you'll have a recording of your presentation to critique.',
+        '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Screening Room', '258', 30,
+        'Our Screening Room is designed for groups to view films. It is located on the 2nd floor of the library and fits up to 30 people.',
+        '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('RLC Seminar Room', '', 6,
+        'Contains a small conference table, large-screen monitor, and a projector with cables to connect to your laptop.',
+        '00:00:00', '24:00:00', '00:00:00', '24:00:00', '00:00:00', '24:00:00'),
+    ('Group Study Room 1', '210', 2, 'Small group study room with chalkboard.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 2', '211', 2, 'Small group study room with a whiteboard and a chalkboard.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 3', '212', 2, 'A small group study room.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 4', '213', 2, 'Small group study room with a chalkboard.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 5', '369', 2, 'Small group study room.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 6', '370', 2, 'Small group study room.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 7', '371', 2, 'Small group study room.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 8', '372', 2, 'Small group study room.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 9', '373', 2, 'Small group study room', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 10', '374', 2, 'Small group study room with chalkboard.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 11', '453', 4, 'Small group study room with a whiteboard.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 12', '454', 4, 'Small group study room with computer.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 13', '456', 4, 'Small group study room with a computer', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Group Study Room 14', '457', 4, 'Small group study room with a computer', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 1', '204', 1, '', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 2', '205', 1, '', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 3', '206', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 4', '207', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 5', '208', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 6', '209', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 7', '231', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 8', '232', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
 
+/*
 INSERT INTO RoomReservations
-(room_id, user_id, purpose, reservation_date, start_time, end_time, status, notes)
+(room_id, reservation_date, start_time, end_time, created_at, is_canceled)
 VALUES
     (1, 1, 'Faculty research meeting', '2026-03-28', '09:00:00', '10:30:00', 'Completed', 'Weekly coordination meeting'),
     (2, 2, 'Student study group', '2026-03-29', '13:00:00', '15:00:00', 'Completed', 'CMSC exam review'),
@@ -45,6 +82,7 @@ VALUES
     (3, 4, 'Student organization meeting', '2026-04-03', '18:00:00', '19:30:00', 'Pending', 'Club transition meeting'),
     (4, 3, 'Library orientation session', '2026-04-05', '09:30:00', '11:00:00', 'Approved', 'Orientation for new workers'),
     (6, 5, 'Digital tools workshop', '2026-04-06', '13:30:00', '15:00:00', 'Approved', 'Workshop on media tools');
+*/
 
 INSERT INTO BookLocator (title, author, isbn, shelf_location, availability_status)
 VALUES

@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from app.backend.constants import NOT_FETCHED
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 class DB:
@@ -32,7 +33,28 @@ class DB:
         return cursor
 
     def get_one(self, command, params):
-        return self.execute_command(command, params).fetchone()
+        """
+        sqlite3's fetchone wrapped with some code. fetchone will return a tuple if a match is found, otherwise None. If fetchone fails,
+        this function will return an empty object.
+        """
+        result = NOT_FETCHED
+        try:
+            result = self.execute_command(command, params).fetchone()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
 
+        return result
+
+    #
     def get_all(self, command, params):
-        return self.execute_command(command, params).fetchall()
+        """
+        sqlite3's fetchall wrapped with some code. fetchall will return a list of tuple(s) if match(es) are found, otherwise an empty list. If fetchall fails,
+        this function will return an empty object.
+        """
+        result = NOT_FETCHED
+        try:
+            result = self.execute_command(command, params).fetchall()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+
+        return result

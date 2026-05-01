@@ -12,3 +12,8 @@ class DBRoomFunctions:
         """
         params = ()
         return self.db.execute_command(query, params)
+
+    def get_room_by_location(self, room_location):
+        query = "Select * From Rooms Where room_location = '{}'".format(room_location)
+        params = ()
+        return self.db.get_one(query, params)
