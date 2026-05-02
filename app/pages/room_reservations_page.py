@@ -1,8 +1,15 @@
+from app.components.navbar import render_navbar
 import streamlit as st
 import pandas as pd
 import sys
 from pathlib import Path
 from datetime import date
+
+st.set_page_config(
+    page_title="Room Reservations",
+    page_icon="x",
+    layout="wide"
+)
 
 #SECURITY check lol
 if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
@@ -19,11 +26,7 @@ sys.path.append(str(PROJECT_ROOT))
 
 from app.backend.get_db import get_db
 
-st.set_page_config(
-    page_title="Room Reservations",
-    page_icon="x",
-    layout="wide"
-)
+render_navbar() 
 
 db = get_db()
 

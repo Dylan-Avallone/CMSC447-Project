@@ -1,6 +1,7 @@
+from app.components.navbar import render_navbar
 import streamlit as st
 from pathlib import Path
-import sys
+import sys 
 
 
 st.set_page_config(
@@ -8,6 +9,8 @@ st.set_page_config(
     page_icon="📚",
     layout="wide"
 )
+
+render_navbar()
 
 PAGE_DIR = Path(__file__).resolve().parent
 APP_DIR = PAGE_DIR.parent
