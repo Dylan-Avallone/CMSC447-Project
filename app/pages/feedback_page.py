@@ -3,12 +3,24 @@ import sys
 import os
 import smtplib
 from email.message import EmailMessage
-
+from app.backend.table_object_classes.user import User
 from app.backend.table_object_classes.feedback import Feedback
 from app.backend.table_function_classes.db_feedback_functions import DBFeedbackFunctions
+from app.backend.table_function_classes.db_user_functions import DBUserFunctions
 from app.backend.get_db import get_db
+from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+db = get_db()
+feedback_functions = DBFeedbackFunctions(db)
+user_functions = DBUserFunctions(db)
+
+if not "user" in st.session_state:
+    if st.user.is_logged_in():
+        st.session_state["user"] = user_functions.get_user(st.user.email)
+    else:
+        st.session_state["user"] = User()
 
 def notify_developers(feedback_content, developer_emails):
     # Configuration (Use environment variables for security!)
@@ -32,8 +44,6 @@ def notify_developers(feedback_content, developer_emails):
         except Exception as e:
             print(f"Failed to send to {recipient}: {e}")
 
-db = get_db()
-
 #home button
 if st.button("Back to Home"):
     st.switch_page("pages/home_page.py")
@@ -42,17 +52,19 @@ if st.button("Back to Home"):
 st.title("Feedback")
 st.caption("Having issues; recommendations?")
 
+option = st.selectbox("Select an option", Feedback.TYPES, format_func=lambda o: o.title())
+content = st.text_area("Enter your feedback", max_chars=Feedback.MAX_LENGTH)
 
-option = st.selectbox(
-    "Select an option",
-    ["Bug Report",
-            "Feature Request",
-            "Compliment"]
-)
-
-content = st.text_area("Enter your feedback", max_chars=max_chars)
 submit = st.button("Submit")
 if submit:
-    db.add_feedback(option, content)
+    most_recent_feedback = feedback_functions.get_last_feedback(st.session_state["user"])
+    time_since_last_submission = datetime.now() - most_recent_feedback.created_at
+    if time_since_last_submission.minutes < 5:
+        st.error("Can't submit feedback less than 5 minutes apart. Please wait {} minutes before submitting.".format(5 - time_since_last_submission.minutes))
+    elif content is None:
+        st.error("Please enter a description before submitting!")
+    else:
+        feedback = Feedback(option, content)
+        feedback_functions.add_feedback(feedback)
 
     st.write(db.get_printable_table("FeedbackForms"))

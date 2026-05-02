@@ -1,5 +1,6 @@
-INSERT INTO Users (user_name, user_email, user_role)
+INSERT INTO Users (user_id, user_name, user_email, user_role)
 VALUES
+    (-1, 'Anonymous')
     ('Ryan', 'ryano3@umbc.edu', 'developer'),
     ('Ava Johnson', 'avaj@umbc.edu', 'user'),
     ('Marcus Lee', 'mlee2@umbc.edu', 'user'),

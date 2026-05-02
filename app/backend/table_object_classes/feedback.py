@@ -1,13 +1,16 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import ClassVar
 
 @dataclass
 class Feedback:
     MAX_LENGTH: ClassVar[int] = 1000
     TYPES: ClassVar[list] = ['bug report', 'feature request', 'compliment']
-    id: int
     type: str
     content: str
+    id: int = -1
+    user_id: int = -1
+    created_at: datetime = datetime.now()
     def __post_init__(self):
         errors = []
 

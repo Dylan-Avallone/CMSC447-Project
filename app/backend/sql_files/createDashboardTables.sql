@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS Users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_name VARCHAR(100) NOT NULL,
     user_email VARCHAR(100) UNIQUE,
-    user_role VARCHAR(20) NOT NULL
+    user_role VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS Departments (
@@ -81,5 +81,5 @@ CREATE TABLE IF NOT EXISTS FeedbackForms (
     form_type VARCHAR(30) DEFAULT 'bug report',
     form_content VARCHAR(1000) NOT NULL,
     submission_time DATETIME DEFAULT CURRENT_TIMESTAMP
-  
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );

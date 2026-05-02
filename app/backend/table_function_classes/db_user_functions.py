@@ -11,7 +11,7 @@ class DBUserFunctions:
         self.DB.execute_command(command, params)
 
     def get_user(self, email) -> User:
-        command = "SELECT * FROM Users WHERE user_email = ?"
+        command = "SELECT * FROM Users WHERE user_email = ? LIMIT 1"
         params = (email,)
         result = self.DB.get_one(command, params)
 
