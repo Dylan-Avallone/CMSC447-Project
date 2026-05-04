@@ -7,6 +7,7 @@ class DB:
     def __init__(self):
         self.file_name = os.path.join(BASE_DIR, "library_data.db")
         self.connection = sqlite3.connect(self.file_name, check_same_thread=False)
+        self.connection.row_factory = sqlite3.Row
         self.load_db(['sql_files/dropDashboardTables.sql',
                       'sql_files/createDashboardTables.sql',
                       'sql_files/loadStaticDashboardTables.sql'])

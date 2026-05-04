@@ -18,7 +18,7 @@ class DBUserFunctions:
         if result:
             return User(id=result[0], username=result[1], email=result[2], role=result[3])
         else:
-            return User(id=-1)
+            return User()
 
     def get_users_by_role(self, role: str) -> list[User]:
         command = "SELECT user_id, user_name, user_email, user_role FROM Users WHERE user_role = ?"

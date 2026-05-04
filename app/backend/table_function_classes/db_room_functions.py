@@ -1,4 +1,5 @@
 from app.backend.db import DB
+from app.backend.table_object_classes.room import Room
 
 class DBRoomFunctions:
     def __init__(self, db_:DB):
@@ -11,9 +12,10 @@ class DBRoomFunctions:
         ORDER BY room_name ASC
         """
         params = ()
-        return self.db.execute_command(query, params)
+        return self.db.get_all(query, params)
 
     def get_room_by_location(self, room_location):
         query = "Select * From Rooms Where room_location = '{}'".format(room_location)
         params = ()
-        return self.db.get_one(query, params)
+        result = self.db.get_one(query, params)
+        return Room(result)

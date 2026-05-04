@@ -19,7 +19,7 @@ class DBPrinterFunctions:
         ORDER BY printer_name ASC
         """
         params = ()
-        return self.db.execute_command(query, params)
+        return self.db.get_all(query, params)
 
     def get_printers_needing_attention_count(self):
         query = """
@@ -30,5 +30,5 @@ class DBPrinterFunctions:
         OR curr_status IN ('Offline', 'Maintenance')
         """
         params = ()
-        result = self.db.execute_command(query, params)
-        return result[0][0] if result else 0
+        result = self.db.get_one(query, params)
+        return result[0] if result else 0

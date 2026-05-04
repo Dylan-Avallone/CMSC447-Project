@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS Users (
-    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name VARCHAR(100) NOT NULL,
-    user_email VARCHAR(100) UNIQUE,
-    user_role VARCHAR(20)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    role VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS Departments (
@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS Departments (
 );
 
 CREATE TABLE IF NOT EXISTS Room (
-    room_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    room_name VARCHAR(50) NOT NULL,
-    room_location VARCHAR(100),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(50) NOT NULL,
+    location VARCHAR(100),
     capacity INT,
     description VARCHAR(250),
     wd_avblty_start TIME,
@@ -28,12 +28,12 @@ CREATE TABLE IF NOT EXISTS Room (
 );
 
 CREATE TABLE IF NOT EXISTS RoomReservations (
-    reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     room_id INT NOT NULL,
     reservation_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    request_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_canceled INT DEFAULT 0,
     FOREIGN KEY (room_id) REFERENCES Room(room_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
@@ -77,9 +77,10 @@ CREATE TABLE IF NOT EXISTS LibraryEntryLog (
 );
 
 CREATE TABLE IF NOT EXISTS FeedbackForms (
-    form_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    form_type VARCHAR(30) DEFAULT 'bug report',
-    form_content VARCHAR(1000) NOT NULL,
-    submission_time DATETIME DEFAULT CURRENT_TIMESTAMP
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type VARCHAR(30) DEFAULT 'bug report',
+    content VARCHAR(1000) NOT NULL,
+    submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );

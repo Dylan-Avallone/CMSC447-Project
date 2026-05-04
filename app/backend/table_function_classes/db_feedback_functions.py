@@ -14,10 +14,11 @@ class DBFeedbackFunctions:
         params = (feedback.type, feedback.content)
         self.db.execute_command(query, params)
 
-    def get_last_feedback(self, user:User):
+    def get_last_feedback(self, user:User) -> Feedback:
         """
         Given a User object, searches the database and returns the Feedback object with the most recent timestamp.
         """
         query = "SELECT * FROM FeedbackForms WHERE user_id = ? ORDER BY timestamp DESC LIMIT 1"
         params = (user.id,)
-        return self.db.get_one(query, params)
+        result = self.db.get_one(query, params)
+        return Feedback.from_row(result)

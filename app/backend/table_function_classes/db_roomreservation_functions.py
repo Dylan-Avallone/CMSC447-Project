@@ -16,8 +16,8 @@ class DBRRFunctions:
         WHERE is_canceled = 0
         """
         params = ()
-        result = self.db.execute_command(query, params)
-        return result[0][0] if result else 0
+        result = self.db.get_one(query, params)
+        return result[0] if result else 0
 
     def add_reservations(self, reservations):
         """

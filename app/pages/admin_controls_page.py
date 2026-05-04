@@ -47,15 +47,13 @@ if st.button("Save Changes"):
     changed_users = changes["edited_rows"]
     added_users = changes["added_rows"]
     deleted_users = changes["deleted_rows"]
-    for row in added_users:
-        added_user = added_users[row]
-        db.add_user(User(row, added_user["Username"], added_user["Email"], added_user["Role"]))
-    for row in deleted_users:
-        deleted_user = deleted_users[row]
-        db.remove_user(User(row, deleted_user["Username"], deleted_user["Email"], deleted_user["Role"]))
-    for row in changed_users:
-        changed_user = changed_users[row]
-        changed_user_obj = User(row)
-        for attr in changed_user:
-            setattr(changed_user_obj, attr, changed_user[attr])
-        db.edit_user(changed_user_obj)
+
+    actions = {
+        "add": (added_users, db.add_user),
+        "remove": (deleted_users, db.remove_user),
+        "edit": (changed_users, db.edit_user)
+    }
+    for action_name, (user_group, db_method) in actions.items():
+        for row_id, data in user_group.items():
+            user_obj = User.from_row(data)  # Assuming you add this method
+            db_method(user_obj)

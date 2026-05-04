@@ -1,7 +1,11 @@
 import streamlit as st
 from pathlib import Path
 import sys
-
+from app.backend.get_db import get_db
+from app.backend.table_function_classes.db_roomreservation_functions import DBRRFunctions
+from app.backend.table_function_classes.db_printer_functions import DBPrinterFunctions
+from app.backend.table_function_classes.db_user_functions import DBUserFunctions
+from app.backend.table_object_classes.user import User
 
 st.set_page_config(
     page_title="UMBC Library Dashboard",
@@ -16,18 +20,21 @@ sys.path.append(str(PROJECT_ROOT))
 ASSETS_DIR = APP_DIR / "assets"
 LOGO_PATH = ASSETS_DIR / "umbclogo.png"
 
-from app.backend.get_db import get_db
 db = get_db()
+rr_functions = DBRRFunctions(db)
+printer_functions = DBPrinterFunctions(db)
+user_functions = DBUserFunctions(db)
 
 #sys overview
-pending_reservations_count = db.get_pending_reservations_count()
-printers_attention_count = db.get_printers_needing_attention_count()
-
+pending_reservations_count = rr_functions.get_reservations_count()
+printers_attention_count = printer_functions.get_printers_needing_attention_count()
 
 #user login flag
-is_logged_in = hasattr(st.user, "is_logged_in") and st.user.is_logged_in
-name = getattr(st.user, "name", None) or "Guest"
-email = getattr(st.user, "email", None) or "Not signed in"
+if not "user" in st.session_state:
+    if st.user.is_logged_in:
+        st.session_state["user"] = user_functions.get_user(st.user.email)
+    else:
+        st.session_state["user"] = User()
 
 st.markdown(
     """
@@ -147,12 +154,12 @@ with left:
    
     st.markdown('<div class="card-title">Account</div>', unsafe_allow_html=True)
 
-    if is_logged_in:
+    if st.user.is_logged_in:
         st.markdown(
             f"""
             <div class="account-box">
-                <div><strong>Name:</strong> {name}</div>
-                <div><strong>Email:</strong> {email}</div>
+                <div><strong>Name:</strong> {st.session_state["user"].username}</div>
+                <div><strong>Email:</strong> {st.session_state["user"].email}</div>
                 <div><strong>Status:</strong> Authenticated through Google</div>
             </div>
             """,
@@ -175,7 +182,7 @@ with spacer:
     st.write("")
 
 with right:
-    if is_logged_in:
+    if st.user.is_logged_in:
         st.markdown('<div class="card-title">System Overview</div>', unsafe_allow_html=True)
         st.markdown(
             """
@@ -225,7 +232,7 @@ with c1:
             unsafe_allow_html=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
-        if is_logged_in:
+        if st.user.is_logged_in:
             if st.button("Open Books Page", use_container_width=True, key="books_btn"):
                 st.switch_page("pages/books_page.py")
         else:
@@ -240,7 +247,7 @@ with c2:
             unsafe_allow_html=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
-        if is_logged_in:
+        if st.user.is_logged_in:
             if st.button("Open Reservations Page", use_container_width=True, key="rooms_btn"):
                 st.switch_page("pages/room_reservations_page.py")
         else:
@@ -258,7 +265,7 @@ with c3:
             unsafe_allow_html=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
-        if is_logged_in:
+        if st.user.is_logged_in:
             if st.button("Open Printer Page", use_container_width=True, key="printer_btn"):
                 st.switch_page("pages/printer_page.py")
         else:
@@ -273,7 +280,7 @@ with c4:
             unsafe_allow_html=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
-        if is_logged_in:
+        if st.user.is_logged_in:
             if st.button("Open Library Traffic Page", use_container_width=True, key="library_traffic_btn"):
                 st.switch_page("pages/library_traffic_page.py")
         else:
@@ -294,8 +301,8 @@ with c5:
         if st.button("Open Feedback Page", use_container_width=True, key="feedback_btn"):
             st.switch_page("pages/feedback_page.py")
 
-if is_logged_in:
-    user_role = db.get_user(st.user.email).role
+if st.user.is_logged_in:
+    user_role = st.session_state["user"].role
     if user_role == "admin" or user_role == "developer":
         with c6:
             with st.container():

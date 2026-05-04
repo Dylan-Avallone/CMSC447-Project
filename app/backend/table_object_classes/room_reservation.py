@@ -9,6 +9,7 @@ class RoomReservation:
     start_time: datetime.time
     end_time: datetime.time
     request_timestamp: datetime.datetime
+    is_canceled: int = 0
 
     def __eq__(self, other):
         """
@@ -23,3 +24,15 @@ class RoomReservation:
 
     def __hash__(self):
         return hash((self.room_id, self.date, self.start_time))
+
+    @classmethod
+    def from_row(cls, row):
+        try:
+            return cls(row["id"],
+                       row["room_id"],
+                       row["reservation_date"],
+                       row["start_time"],
+                       row["end_time"],
+                       row["request_timestamp"],)
+        except (KeyError, IndexError) as e:
+            raise AttributeError(f"Database Mapping Error: Column {e} not found in row passed to from_row") from e

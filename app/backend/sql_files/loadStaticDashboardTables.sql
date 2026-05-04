@@ -1,11 +1,11 @@
 INSERT INTO Users (user_id, user_name, user_email, user_role)
 VALUES
-    (-1, 'Anonymous')
-    ('Ryan', 'ryano3@umbc.edu', 'developer'),
-    ('Ava Johnson', 'avaj@umbc.edu', 'user'),
-    ('Marcus Lee', 'mlee2@umbc.edu', 'user'),
-    ('Sophia Patel', 'spatel4@umbc.edu', 'user'),
-    ('Daniel Kim', 'dkim7@umbc.edu', 'user');
+    (-1, 'Anonymous/Unknown', '', ''),
+    (0, 'Ryan', 'ryano3@umbc.edu', 'developer'),
+    (1, 'Ava Johnson', 'avaj@umbc.edu', 'user'),
+    (2, 'Marcus Lee', 'mlee2@umbc.edu', 'user'),
+    (3, 'Sophia Patel', 'spatel4@umbc.edu', 'user'),
+    (4, 'Daniel Kim', 'dkim7@umbc.edu', 'user');
 
 INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
 VALUES
@@ -36,7 +36,7 @@ VALUES
         'This room is available to UMBC students, faculty, and staff. It contains a small conference table and a smart TV with Chromecast, which allows a laptop, tablet or smartphone to stream content to the screen.',
         '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
     ('Presentation Practice Room', '257', 8,
-        'This room has been set up for students to practice giving presentations, speeches, etc. Bring your flash drive to plug into our one-button recording system - when you're finished, you'll have a recording of your presentation to critique.',
+        "This room has been set up for students to practice giving presentations, speeches, etc. Bring your flash drive to plug into our one-button recording system - when you're finished, you'll have a recording of your presentation to critique.",
         '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
     ('Screening Room', '258', 30,
         'Our Screening Room is designed for groups to view films. It is located on the 2nd floor of the library and fits up to 30 people.',
@@ -65,7 +65,7 @@ VALUES
     ('Individual Study Room 5', '208', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
     ('Individual Study Room 6', '209', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
     ('Individual Study Room 7', '231', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
-    ('Individual Study Room 8', '232', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
+    ('Individual Study Room 8', '232', 1, 'Study room with seating for one', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00');
 
 /*
 INSERT INTO RoomReservations

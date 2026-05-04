@@ -10,7 +10,7 @@ class Feedback:
     content: str
     id: int = -1
     user_id: int = -1
-    created_at: datetime = datetime.now()
+    submission_time: datetime = datetime.now()
     def __post_init__(self):
         errors = []
 
@@ -22,3 +22,14 @@ class Feedback:
 
         if errors:
             raise ExceptionGroup("Validation failed: ", errors)
+
+    @classmethod
+    def from_row(cls, row):
+        try:
+            return cls(row["type"],
+                   row["content"],
+                   row["id"],
+                   row["user_id"],
+                   row["submission_time"])
+        except (KeyError, IndexError) as e:
+            raise AttributeError(f"Database Mapping Error: Column {e} not found in row passed to from_row") from e
