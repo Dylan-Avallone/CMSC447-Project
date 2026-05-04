@@ -6,7 +6,7 @@ from app.backend.table_object_classes.table_object import TableObject
 class User(TableObject):
     ROLES: ClassVar[list] = ["admin", "user", "developer"]
     id: int = -1
-    name: str = "Anonymous/Unknown"
+    name: str = "Anonymous"
     email: str = None
     role: str = None
 
