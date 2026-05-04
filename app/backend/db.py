@@ -13,6 +13,9 @@ class DB:
                       'sql_files/loadStaticDashboardTables.sql'])
 
     def load_db(self, sql_files):
+        """
+        Takes a list of SQL files and runs sqlite3's executescript() on them in the order they appear in the list.
+        """
         with self.connection as connection:
             for file in sql_files:
                 with open(os.path.join(BASE_DIR, file), 'r') as f:
@@ -20,11 +23,13 @@ class DB:
                     connection.executescript(sqlfile)
 
     def get_printable_table(self, table):
-        with self.connection as connection:
-            cursor = connection.cursor()
-            result = cursor.execute(f"SELECT * FROM {table};")
+        """
+        Returns all entries within a given table, in the format specified by get_all().
+        """
+        command = f"SELECT * FROM {table};"
+        params = ()
 
-        return result.fetchall()
+        return self.get_all(command, params)
 
     def execute_command(self, command, params):
         with self.connection as connection:
@@ -35,7 +40,7 @@ class DB:
 
     def get_one(self, command, params):
         """
-        sqlite3's fetchone wrapped with some code. fetchone will return a tuple if a match is found, otherwise None. If fetchone fails,
+        sqlite3's fetchone wrapped with some code. fetchone will return a dictionary if a match is found, otherwise None. If fetchone fails,
         this function will return an empty object.
         """
         result = NOT_FETCHED
@@ -49,7 +54,7 @@ class DB:
     #
     def get_all(self, command, params):
         """
-        sqlite3's fetchall wrapped with some code. fetchall will return a list of tuple(s) if match(es) are found, otherwise an empty list. If fetchall fails,
+        sqlite3's fetchall wrapped with some code. fetchall will return a list of dictionary(s) if match(es) are found, otherwise an empty list. If fetchall fails,
         this function will return an empty object.
         """
         result = NOT_FETCHED

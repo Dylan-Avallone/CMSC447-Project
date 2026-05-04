@@ -6,11 +6,20 @@ class DBUserFunctions:
         self.DB = db
 
     def add_user(self, user: User):
-        command = "INSERT INTO Users (user_name, user_email, user_role) VALUES (?, ?, ?)"
-        params = (user.username, user.email, user.role)
+        """
+        Takes a User object and creates an insertion command using values from the attributes of the object.
+        """
+        command = None
+        params = ()
+        if user.id == -1:
+            command = "INSERT INTO Users (name, email, role) VALUES (?, ?, ?)"
+            params = (user.username, user.email, user.role)
+        else: # Attempt to add this user which has a non-default ID.
+            command = "INSERT INTO Users (id, name, email, role) VALUES (?, ?, ?, ?)"
+            params = (user.id, user.username, user.email, user.role)
         self.DB.execute_command(command, params)
 
-    def get_user(self, email) -> User:
+    def get_user(self, user: User) -> User:
         command = "SELECT * FROM Users WHERE user_email = ? LIMIT 1"
         params = (email,)
         result = self.DB.get_one(command, params)
