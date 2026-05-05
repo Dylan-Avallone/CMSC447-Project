@@ -5,3 +5,7 @@ class TableObject(ABC):
     @abstractmethod
     def from_row(cls, row):
         pass
+
+    @abstractmethod
+    def to_row(self):
+        pass

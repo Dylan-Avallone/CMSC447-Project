@@ -1,6 +1,6 @@
 import requests
 import warnings
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, time
 from app.backend.get_db import get_db
 from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
 from app.backend.table_object_classes.room_reservation import RoomReservation
@@ -45,16 +45,16 @@ class RoomAvailabilityScraper:
         7818: '454',
         7819: '456',
         7820: '457',
-        7821: 'Lactation Room (755)',
-        14465: 'Screening Room (258)',
+        7821: '755',
+        14465: '258',
         19760: '208',
         19773: '209',
         19774: '231',
         19782: '232',
         23252: '207',
         30943: '206',
-        30977: 'Presentation Practice Room (257)',
-        43107: 'Collaboration Room (368)',
+        30977: '257',
+        43107: '368',
         107579: None,
         107867: None,
         113401: None,
@@ -79,6 +79,11 @@ class RoomAvailabilityScraper:
     # Apparently, requesting more than 31 days of room booking data causes an error.
     # To handle this, then, I will split requests for more than 31 days of data into multiple requests.
     def scrape_room_availability(self, start_day_, end_day_):
+        """
+        :param start_day_: A datetime.date object.
+        :param end_day_: A datetime.date object.
+        :return: A list of dictionaries returned by the API call representing timeslots, reserved or not.
+        """
         result = []
         start_day = start_day_
         temp_end_day = start_day_
@@ -96,8 +101,12 @@ class RoomAvailabilityScraper:
 
         return result
 
-    # All this does is take the data from scrape_room_availability, and transform it into a list of bookings
     def format_availability_data(self, availability_data):
+        """
+        Note, all dictionaries without the "className" key (which is how the UMBC library tags timeslots that are reserved) are tossed.
+        :param availability_data: A list of dictionaries representing bookings. Probably taken from get_current_bookings().
+        :return: A list of RoomReservation objects.
+        """
         room_db = DBRoomFunctions(get_db())
         bookings = []
         for slot in availability_data:
@@ -106,10 +115,10 @@ class RoomAvailabilityScraper:
                     warnings.warn("The system doesn't a name for this room!")
                 else:
                     if slot["className"] == "s-lc-eq-checkout":
-                        room_id = room_db.get_room_by_location(self.ITEM_ID_TO_ROOM_MAP[slot["itemId"]])
-                        date: object = slot["start"][0:10]
-                        start_time = slot["start"][11:]
-                        end_time = slot["end"][11:]
+                        room_id = room_db.get_room_by_location(self.ITEM_ID_TO_ROOM_MAP[slot["itemId"]]).id
+                        date = datetime.fromisoformat(slot["start"]).date()
+                        start_time = datetime.fromisoformat(slot["start"]).time()
+                        end_time = datetime.fromisoformat(slot["end"]).time()
                         request_timestamp = datetime.now()
                         reservation = RoomReservation(-1, room_id, date, start_time, end_time, request_timestamp)
                         bookings.append(reservation)

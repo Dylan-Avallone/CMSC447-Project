@@ -15,7 +15,6 @@ def handle_add_user(db_functions: DBUserFunctions, row_id_, row):
 
 def handle_remove_user(db_functions: DBUserFunctions, row_id_, row):
     user = User.from_row(row)
-    curr_user = st.session_state['user']
     if st.session_state['user'].has_higher_privilege(user):
         db_functions.remove_user(user)
     else:

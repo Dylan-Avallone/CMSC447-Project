@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 CREATE TABLE IF NOT EXISTS Departments (
-    department_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    department_name VARCHAR(100) NOT NULL,
-    department_code VARCHAR(20) UNIQUE,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(20) UNIQUE,
     faculty_head VARCHAR(100),
     office_location VARCHAR(100)
 );
@@ -35,8 +35,7 @@ CREATE TABLE IF NOT EXISTS RoomReservations (
     end_time TIME NOT NULL,
     request_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_canceled INT DEFAULT 0,
-    FOREIGN KEY (room_id) REFERENCES Room(room_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (room_id) REFERENCES Room(id)
 );
 
 CREATE TABLE IF NOT EXISTS BookLocator (
@@ -51,10 +50,10 @@ CREATE TABLE IF NOT EXISTS BookLocator (
 
 
 CREATE TABLE IF NOT EXISTS Printer (
-    printer_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    printer_name VARCHAR(50) NOT NULL,
-    printer_location VARCHAR(100),
-    printer_model VARCHAR(100),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(50) NOT NULL,
+    location VARCHAR(100),
+    model VARCHAR(100),
     curr_status VARCHAR(30) DEFAULT 'Available',
     toner_level INT,
     paper_level INT,
@@ -62,16 +61,16 @@ CREATE TABLE IF NOT EXISTS Printer (
 );
 
 CREATE TABLE IF NOT EXISTS PrinterUsage (
-    usage_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     pages_printed INT NOT NULL,
     print_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     job_status VARCHAR(30) DEFAULT 'Completed',
     printer_id INT NOT NULL,
-    FOREIGN KEY (printer_id) REFERENCES Printer(printer_id)
+    FOREIGN KEY (printer_id) REFERENCES Printer(id)
 );
 
 CREATE TABLE IF NOT EXISTS LibraryEntryLog (
-    entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     entry_time DATETIME NOT NULL,
     entry_count INT NOT NULL
 );
@@ -82,5 +81,5 @@ CREATE TABLE IF NOT EXISTS FeedbackForms (
     content VARCHAR(1000) NOT NULL,
     submission_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_id) REFERENCES Users(id)
 );

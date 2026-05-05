@@ -1,15 +1,21 @@
 from dataclasses import dataclass
-import datetime
+from datetime import datetime, time, date
 
 @dataclass
 class RoomReservation:
     id: int
     room_id: int
-    date: datetime.date
-    start_time: datetime.time
-    end_time: datetime.time
-    request_timestamp: datetime.datetime
+    date: date
+    start_time: time
+    end_time: time
+    request_timestamp: datetime
     is_canceled: int = 0
+
+    def __post_init__(self):
+        if self.is_canceled != 0 and self.is_canceled != 1:
+            raise AttributeError("Room Reservation is_canceled must be 0 or 1")
+        if (self.start_time > self.end_time) and self.start_time != time.fromisoformat("23:00:00"):
+            raise AttributeError("Room Reservation start_time must be before end_time")
 
     def __eq__(self, other):
         """
@@ -30,9 +36,21 @@ class RoomReservation:
         try:
             return cls(row["id"],
                        row["room_id"],
-                       row["reservation_date"],
-                       row["start_time"],
-                       row["end_time"],
-                       row["request_timestamp"],)
+                       date.fromisoformat(row["reservation_date"]),
+                       time.fromisoformat(row["start_time"]),
+                       time.fromisoformat(row["end_time"]),
+                       row["request_timestamp"],
+                       row["is_canceled"])
         except (KeyError, IndexError) as e:
             raise AttributeError(f"Database Mapping Error: Column {e} not found in row passed to from_row") from e
+
+    def to_row(self):
+        return {"id": self.id,
+                "room_id": self.room_id,
+                "reservation_date": self.date,
+                "start_time": self.start_time,
+                "end_time": self.end_time,
+                "request_timestamp": self.request_timestamp,
+                "is_canceled": self.is_canceled
+        }
+

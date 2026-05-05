@@ -15,7 +15,11 @@ class DBRoomFunctions:
         return self.db.get_all(query, params)
 
     def get_room_by_location(self, room_location):
-        query = "Select * From Rooms Where room_location = '{}'".format(room_location)
-        params = ()
+        """
+        :param room_location: A string representing the location of the room.
+        :return: A Room object
+        """
+        query = "SELECT * FROM Room WHERE location = ? LIMIT 1"
+        params = (room_location,)
         result = self.db.get_one(query, params)
-        return Room(result)
+        return Room.from_row(result)

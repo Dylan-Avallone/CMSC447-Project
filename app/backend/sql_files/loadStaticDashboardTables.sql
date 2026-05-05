@@ -1,4 +1,4 @@
-INSERT INTO Users (user_id, user_name, user_email, user_role)
+INSERT INTO Users (id, name, email, role)
 VALUES
     (-1, 'Anonymous/Unknown', '', ''),
     (0, 'Ryan', 'ryano3@umbc.edu', 'developer'),
@@ -7,7 +7,7 @@ VALUES
     (3, 'Sophia Patel', 'spatel4@umbc.edu', 'user'),
     (4, 'Daniel Kim', 'dkim7@umbc.edu', 'user');
 
-INSERT INTO Departments (department_name, department_code, faculty_head, office_location)
+INSERT INTO Departments (name, code, faculty_head, office_location)
 VALUES
     ('Computer Science', 'CS', 'Dr. Mohamed Younis', 'ITE 325'),
     ('Chemistry', 'CHEM', 'Dr. Brian Cullum', 'MEYR 243B'),
@@ -22,7 +22,7 @@ VALUES
 	('Psychology', 'PSYC', 'Dr. Lira Yoon', 'MP 312'),
 	('Sociology, Anthropology, and Public Health', 'SAPH', 'Dr. Andrea Kalfoglou', 'PUP 233');
     
-INSERT INTO Room (room_name, room_location, capacity, description, wd_avblty_start, wd_avblty_end, sat_avblty_start, sat_avblty_end, sun_avblty_start, sun_avblty_end)
+INSERT INTO Room (name, location, capacity, description, wd_avblty_start, wd_avblty_end, sat_avblty_start, sat_avblty_end, sun_avblty_start, sun_avblty_end)
 VALUES
 /*
     ('Library Study Room A', 'First Floor - East Wing', 4, 'Study Room'),
@@ -41,7 +41,7 @@ VALUES
     ('Screening Room', '258', 30,
         'Our Screening Room is designed for groups to view films. It is located on the 2nd floor of the library and fits up to 30 people.',
         '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
-    ('RLC Seminar Room', '', 6,
+    ('RLC Seminar Room', 'RLC Seminar Room', 6,
         'Contains a small conference table, large-screen monitor, and a projector with cables to connect to your laptop.',
         '00:00:00', '24:00:00', '00:00:00', '24:00:00', '00:00:00', '24:00:00'),
     ('Group Study Room 1', '210', 2, 'Small group study room with chalkboard.', '08:00:00', '22:00:00', '10:00:00', '17:00:00', '12:00:00', '22:00:00'),
@@ -69,7 +69,7 @@ VALUES
 
 /*
 INSERT INTO RoomReservations
-(room_id, reservation_date, start_time, end_time, created_at, is_canceled)
+(id, reservation_date, start_time, end_time, created_at, is_canceled)
 VALUES
     (1, 1, 'Faculty research meeting', '2026-03-28', '09:00:00', '10:30:00', 'Completed', 'Weekly coordination meeting'),
     (2, 2, 'Student study group', '2026-03-29', '13:00:00', '15:00:00', 'Completed', 'CMSC exam review'),
@@ -103,7 +103,7 @@ VALUES
 	('Circe', 'Madeline Miller', '9780316556347', 'MYTH-MILL-219', 'Checked Out'),
 	('Quiet: The Power of Introverts', 'Susan Cain', '9780307352156', 'PSY-CAIN-332', 'Available');
 
-INSERT INTO Printer (printer_name, printer_location, printer_model, curr_status, toner_level, paper_level, last_maintenance)
+INSERT INTO Printer (name, location, model, curr_status, toner_level, paper_level, last_maintenance)
 VALUES
     ('Printer A', 'First Floor - Lobby', 'HP LaserJet Pro 4001', 'Available', 82, 76, '2026-03-15'),
     ('Printer B', 'First Floor - Study Area', 'Canon imageCLASS MF455dw', 'Busy', 64, 52, '2026-03-10'),

@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import sys
 from pathlib import Path
+from app.backend.get_db import get_db
 
-#SECURITY check lol
-if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
+if not st.user.is_logged_in:
     st.warning("You must be signed in to access this page.")
     if st.button("Go to Login"):
         st.switch_page("pages/login_page.py")
@@ -15,8 +15,6 @@ if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
-
-from app.backend.get_db import get_db
 
 st.set_page_config(page_title="Book Management", page_icon="x", layout="wide")
 

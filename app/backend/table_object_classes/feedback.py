@@ -11,6 +11,7 @@ class Feedback:
     id: int = -1
     user_id: int = -1
     submission_time: datetime = datetime.now()
+
     def __post_init__(self):
         errors = []
 
@@ -33,3 +34,6 @@ class Feedback:
                    row["submission_time"])
         except (KeyError, IndexError) as e:
             raise AttributeError(f"Database Mapping Error: Column {e} not found in row passed to from_row") from e
+
+    def to_row(self):
+        return {"type": self.type, "content": self.content, "id": self.id, "user_id": self.user_id, "submission_time": self.submission_time}

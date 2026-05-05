@@ -10,14 +10,12 @@ class DBUserFunctions:
         """
         Takes a User object and creates an insertion command using values from the attributes of the object.
         """
-        command = None
-        params = ()
         if user.id == -1:
             command = "INSERT INTO Users (name, email, role) VALUES (?, ?, ?)"
-            params = (user.username, user.email, user.role)
+            params = (user.name, user.email, user.role)
         else: # Attempt to add this user which has a non-default ID.
             command = "INSERT INTO Users (id, name, email, role) VALUES (?, ?, ?, ?)"
-            params = (user.id, user.username, user.email, user.role)
+            params = (user.id, user.name, user.email, user.role)
         self.DB.execute_command(command, params)
 
     def get_user(self, user: User) -> User:
@@ -25,7 +23,7 @@ class DBUserFunctions:
         :param user: An incomplete User object. Needs to have the email field, because this is what the function uses to find the rest of the info.
         :return: Either returns a default User object if no match was found, or a complete User object.
         """
-        command = "SELECT * FROM Users WHERE user_email = ? LIMIT 1"
+        command = "SELECT * FROM Users WHERE email = ? LIMIT 1"
         params = (user.email,)
         result = self.DB.get_one(command, params)
 
@@ -42,10 +40,10 @@ class DBUserFunctions:
         if role not in User.ROLES:
             warnings.warn("Invalid role detected. Check spelling!")
 
-        command = "SELECT user_id, user_name, user_email, user_role FROM Users WHERE user_role = ?"
+        command = "SELECT id, name, email, role FROM Users WHERE role = ?"
         params = (role,)
         result = self.DB.get_all(command, params)
-        return [User(id=r[0], username=r[1], email=r[2], role=r[3]) for r in result]
+        return [User.from_row(row) for row in result]
 
     def remove_user(self, user:User):
         """
@@ -56,7 +54,7 @@ class DBUserFunctions:
         if len(self.get_users_by_role(user.role)) <= 1:
             return
         else:
-            command = "DELETE FROM Users WHERE user_id = ?"
+            command = "DELETE FROM Users WHERE id = ?"
             params = (user.id,)
             self.DB.execute_command(command, params)
 
@@ -69,18 +67,18 @@ class DBUserFunctions:
         params = []
 
         if user.name != "Anonymous":
-            updates.append("user_name = ?")
+            updates.append("name = ?")
             params.append(user.name)
         if user.email is not None:
-            updates.append("user_email = ?")
+            updates.append("email = ?")
             params.append(user.email)
         if user.role is not None:
-            updates.append("user_role = ?")
+            updates.append("role = ?")
             params.append(user.role)
 
         if not updates:
             return
 
         params.append(user.id)
-        command = f"UPDATE Users SET {', '.join(updates)} WHERE user_id = ?"
+        command = f"UPDATE Users SET {', '.join(updates)} WHERE id = ?"
         self.DB.execute_command(command, params)

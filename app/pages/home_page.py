@@ -32,7 +32,8 @@ printers_attention_count = printer_functions.get_printers_needing_attention_coun
 #user login flag
 if not "user" in st.session_state:
     if st.user.is_logged_in:
-        st.session_state["user"] = user_functions.get_user(st.user.email)
+        partial_user_obj = User(email=st.user.email)
+        st.session_state["user"] = user_functions.get_user(partial_user_obj)
     else:
         st.session_state["user"] = User()
 
@@ -158,7 +159,7 @@ with left:
         st.markdown(
             f"""
             <div class="account-box">
-                <div><strong>Name:</strong> {st.session_state["user"].username}</div>
+                <div><strong>Name:</strong> {st.session_state["user"].name}</div>
                 <div><strong>Email:</strong> {st.session_state["user"].email}</div>
                 <div><strong>Status:</strong> Authenticated through Google</div>
             </div>

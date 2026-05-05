@@ -47,7 +47,7 @@ class DB:
         try:
             result = self.execute_command(command, params).fetchone()
         except sqlite3.Error as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred in get_one: {e}")
 
         return result
 

@@ -4,7 +4,7 @@ from app.backend.table_object_classes.table_object import TableObject
 
 @dataclass
 class User(TableObject):
-    ROLES: ClassVar[list] = ["admin", "user", "developer"]
+    ROLES: ClassVar[list] = ["admin", "user", "developer", None]
     id: int = -1
     name: str = "Anonymous"
     email: str = None
@@ -22,6 +22,9 @@ class User(TableObject):
             return cls(row["id"], row["name"], row["email"], row["role"])
         except (KeyError, IndexError) as e:
             raise AttributeError(f"Database Mapping Error: Column {e} not found in row passed to from_row") from e
+
+    def to_row(self):
+        return {"id": self.id, "name": self.name, "email": self.email, "role": self.role}
 
     def update_from_row(self, changes):
         """

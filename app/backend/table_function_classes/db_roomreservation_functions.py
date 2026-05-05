@@ -1,8 +1,14 @@
+import sqlite3
+
 from app.backend.db import DB
 from app.backend.constants import NOT_FETCHED
 from app.backend.table_object_classes.room_reservation import RoomReservation
+from app.backend.room_availability_scraper import RoomAvailabilityScraper
+import datetime
 
 class DBRRFunctions:
+    reservation_scraper: RoomAvailabilityScraper = RoomAvailabilityScraper()
+
     def __init__(self, db_:DB):
         self.db = db_
 
@@ -23,35 +29,37 @@ class DBRRFunctions:
         """
         If the combination of the date, start time, and room are unknown to the DB, then just add it. Otherwise, check that the new data is fresher, and if it is, use that.
         Additionally, remove reservations from the DB if the fresher data shows that the reservation has been canceled.
+        :param reservations: A list of RoomReservation objects
+        :return: None
         """
-        db_reservations_set = set(self.get_reservations())
-        web_reservations_set = set(reservations)
-        reservations_to_delete = db_reservations_set - web_reservations_set
-        reservations_to_add = web_reservations_set - db_reservations_set
+        old_reservations_set = set(self.get_reservations())
+        new_reservations_set = set(reservations)
+        reservations_to_delete = old_reservations_set - new_reservations_set
+        reservations_to_add = new_reservations_set - old_reservations_set
         query = None
         params = None
 
         for reservation in reservations_to_delete:
             query = "UPDATE RoomReservations SET is_canceled = 1 WHERE room_id = ? AND reservation_date = ? AND start_time = ?"
-            params = (reservation.room_id, reservation.date, reservation.start_time)
+            params = (reservation.room_id, reservation.date.isoformat(), reservation.start_time.isoformat())
             self.db.execute_command(query, params)
 
         for reservation in reservations_to_add:
             if reservation.id != -1: # Already has an assigned ID
-                query = "SELECT * FROM RoomReservations WHERE reservation_id = ?"
+                query = "SELECT * FROM RoomReservations WHERE id = ?"
                 params = (reservation.id,)
             else:
                 query = "SELECT * FROM RoomReservations WHERE room_id = ? AND reservation_date = ?, AND start_time = ?"
-                params = (reservation.id, reservation.date, reservation.start_time)
+                params = (reservation.room_id, reservation.date.isoformat(), reservation.start_time.isoformat())
 
             result = self.db.get_one(query, params)
-            if result:
-                if result[5] < reservation.request_timestamp:
+            if result is sqlite3.Row:
+                if result["request_timestamp"] < reservation.request_timestamp:
                     query = "UPDATE RoomReservations SET created_at = ?, is_canceled = ?, WHERE room_id = ?"
-                    params = (reservation.request_timestamp, 0, reservation.id)
+                    params = (reservation.request_timestamp.isoformat(), 0, reservation.room_id)
             else:
-                query = "INSERT INTO RoomReservations (room_id, reservation_date, start_time, end_time, created_at) VALUES (?, ?, ?, ?, ?)"
-                params = (reservation.room_id, reservation.date, reservation.start_time, reservation.end_time, reservation.created_at)
+                query = "INSERT INTO RoomReservations (room_id, reservation_date, start_time, end_time, request_timestamp) VALUES (?, ?, ?, ?, ?)"
+                params = (reservation.room_id, reservation.date.isoformat(), reservation.start_time.isoformat(), reservation.end_time.isoformat(), reservation.request_timestamp)
 
             self.db.execute_command(query, params)
 
@@ -65,11 +73,10 @@ class DBRRFunctions:
         result = self.db.get_all(query, params)
         if not result is NOT_FETCHED:
             for reservation_ in result:
-                reservations.append(RoomReservation(id=reservation_[0],
-                                                    room_id=reservation_[1],
-                                                    date=reservation_[2],
-                                                    start_time=reservation_[3],
-                                                    end_time=reservation_[4],
-                                                    request_timestamp=reservation_[5]))
+                reservations.append(RoomReservation.from_row(reservation_))
 
         return reservations
+
+    def refresh_data(self):
+        new_data = self.reservation_scraper.scrape_room_availability(datetime.date.today(), datetime.date.today() + datetime.timedelta(days=7))
+        self.add_reservations(self.reservation_scraper.format_availability_data(new_data))
