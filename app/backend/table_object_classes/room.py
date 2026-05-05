@@ -34,8 +34,8 @@ class Room(TableObject):
     def from_row(cls, row):
         try:
             return cls(row["id"],
-                row["name"],
-                row["location"],
+                row["type"],
+                row["number"],
                 row["capacity"],
                 row["description"],
                 row["wd_avblty_start"],

@@ -2,13 +2,14 @@ import streamlit as st
 import pandas as pd
 import sys
 from pathlib import Path
+from app.backend.get_db import get_db
+from app.backend.table_function_classes.db_printer_functions import DBPrinterFunctions
+from app.backend.table_function_classes.db_printerusage_functions import DBPUFunctions
 
 PAGE_DIR = Path(__file__).resolve().parent
 APP_DIR = PAGE_DIR.parent
 PROJECT_ROOT = APP_DIR.parent
 sys.path.append(str(PROJECT_ROOT))
-
-from app.backend.get_db import get_db
 
 st.set_page_config(page_title="Printer Management", page_icon="🖨️", layout="wide")
 
@@ -20,6 +21,8 @@ if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
     st.stop()
 
 db = get_db()
+printer_functions = DBPrinterFunctions(db)
+pu_functions = DBPUFunctions(db)
 
 st.markdown(
     """
@@ -49,21 +52,15 @@ st.markdown(
 if st.button("Back to Home"):
     st.switch_page("pages/home_page.py")
 
-
-
 #title
 st.title("Printer Management")
 st.caption("Monitor printer availability, maintenance, supply levels, and recent usage.")
 
-
-
-
-
 #-+___________________________-
 # Load data
-printer_rows = db.get_printers()
-usage_rows = db.get_printer_usage()
-summary_rows = db.get_printer_usage_summary()
+printer_rows = printer_functions.get_printers()
+usage_rows = pu_functions.get_printer_usage()
+summary_rows = pu_functions.get_printer_usage_summary()
 
 printer_df = pd.DataFrame(
     printer_rows,
@@ -72,7 +69,6 @@ printer_df = pd.DataFrame(
         "Status", "Toner Level %", "Paper Level %", "Last Maintenance"
     ]
 )
-
 
 #----------------------
 # warning

@@ -6,14 +6,14 @@ class DBPUFunctions:
 
     def get_printer_usage(self):
         query = """
-                SELECT pu.usage_id, \
-                       p.printer_name, \
-                       p.printer_location, \
+                SELECT pu.id, \
+                       p.name, \
+                       p.location, \
                        pu.pages_printed, \
                        pu.job_status, \
                        pu.print_time
                 FROM PrinterUsage pu
-                         JOIN Printer p ON pu.printer_id = p.printer_id
+                         JOIN Printer p ON pu.printer_id = p.id
                 ORDER BY pu.print_time DESC \
                 """
         params = ()
@@ -21,12 +21,12 @@ class DBPUFunctions:
 
     def get_printer_usage_summary(self):
         query = """
-                SELECT p.printer_name, \
-                       COUNT(pu.usage_id)                 AS total_jobs, \
+                SELECT p.name, \
+                       COUNT(pu.id)                 AS total_jobs, \
                        COALESCE(SUM(pu.pages_printed), 0) AS total_pages
                 FROM Printer p
-                         LEFT JOIN PrinterUsage pu ON p.printer_id = pu.printer_id
-                GROUP BY p.printer_id, p.printer_name
+                         LEFT JOIN PrinterUsage pu ON p.id = pu.printer_id
+                GROUP BY p.id, p.name
                 ORDER BY total_pages DESC \
                 """
         params = ()

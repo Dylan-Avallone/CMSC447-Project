@@ -6,6 +6,16 @@ from datetime import date
 from app.backend.get_db import get_db
 from app.backend.table_function_classes.db_roomreservation_functions import DBRRFunctions
 from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
+from app.backend.table_object_classes.room_reservation import RoomReservation
+
+db = get_db()
+rr_functions = DBRRFunctions(db)
+room_functions = DBRoomFunctions(db)
+
+def get_utilization_by_hour(room_number, reservations: list[RoomReservation]):
+    reservations_in_room = [reservation for reservation in reservations
+                            if reservation.room_id == room_functions.get_room_by_room_number(room_number).id]
+
 
 if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
     st.warning("You must be signed in to access this page.")
@@ -24,10 +34,6 @@ st.set_page_config(
     layout="wide"
 )
 
-db = get_db()
-rr_functions = DBRRFunctions(db)
-room_functions = DBRoomFunctions(db)
-
 #home button
 if st.button("Back to Home"):
     st.switch_page("pages/home_page.py")
@@ -35,8 +41,6 @@ if st.button("Back to Home"):
 #title
 st.title("Room Reservations")
 st.caption("Monitor past, current, and upcoming reservations across library rooms.")
-
-
 
 # -----------------------------
 # Data loading
@@ -47,8 +51,7 @@ rows = rr_functions.get_reservations()
 df = pd.DataFrame([rr.to_row() for rr in rows])
 df["is_canceled"] = df["is_canceled"].map({False: "No", True: "Yes"})
 df["room_id"] = df["room_id"].map(room_functions.get_room_mapping())
-df.columns = ["ID", "Room Name", "Date", "Start Time", "End Time", "Request Timestamp", "Is Cancelled"]
-
+df.columns = ["ID", "Student Name", "Room Name", "Date", "Start Time", "End Time", "Request Timestamp", "Is Cancelled"]
 
 if df.empty:
     st.info("No reservation data available yet.")
@@ -56,7 +59,6 @@ if df.empty:
 
 # -----------------------------
 # Cleanup / formatting
-
 df["Start Time"] = df["Start Time"].astype(str).str[:5]
 df["End Time"] = df["End Time"].astype(str).str[:5]
 
@@ -97,7 +99,7 @@ st.markdown("---")
 # Filters
 st.subheader("Filters")
 
-c1, c2 = st.columns(2)
+c1, c2, c3 = st.columns(3)
 
 with c1:
     period_filter = st.selectbox(
@@ -109,7 +111,13 @@ with c2:
     room_options = ["All"] + sorted(df["Room Name"].dropna().unique().tolist())
     room_filter = st.selectbox("Room Name", room_options)
 
+with c3:
+    student_name_filter = st.text_input("Student Name", value="")
+
 filtered_df = df.copy()
+
+if student_name_filter != "":
+    filtered_df = filtered_df[filtered_df["Student Name"] == student_name_filter]
 
 if period_filter != "All":
     filtered_df = filtered_df[filtered_df["Period"] == period_filter]
@@ -154,3 +162,7 @@ with tab3:
         st.info("No past reservations found.")
     else:
         st.dataframe(past_df, use_container_width=True, hide_index=True)
+
+st.subheader("Room Utilization")
+utilization_df = pd.DataFrame()
+st.line_chart()

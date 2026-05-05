@@ -14,13 +14,13 @@ class DBRoomFunctions:
         params = ()
         return self.db.get_all(query, params)
 
-    def get_room_by_room_number(self, room_location):
+    def get_room_by_room_number(self, room_number: str) -> Room:
         """
-        :param room_location: A string representing the location of the room.
+        :param room_number: A string representing the location of the room in the library.
         :return: A Room object
         """
         query = "SELECT * FROM Room WHERE number = ? LIMIT 1"
-        params = (room_location,)
+        params = (room_number,)
         result = self.db.get_one(query, params)
         return Room.from_row(result)
 

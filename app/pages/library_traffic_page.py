@@ -2,13 +2,12 @@ import streamlit as st
 import pandas as pd
 import sys
 from pathlib import Path
+from app.backend.get_db import get_db
 
 PAGE_DIR = Path(__file__).resolve().parent
 APP_DIR = PAGE_DIR.parent
 PROJECT_ROOT = APP_DIR.parent
 sys.path.append(str(PROJECT_ROOT))
-
-from app.backend.get_db import get_db
 
 st.set_page_config(page_title="Library Traffic", page_icon="X", layout="wide")
 

@@ -101,11 +101,10 @@ class RoomAvailabilityScraper:
         :return: A list of RoomReservation objects.
         """
         room_db = DBRoomFunctions(get_db())
-        user_db = DBUserFunctions(get_db())
         bookings = []
         for reservation in booking_data:
             student_name = reservation["nickname"]
-            room_id = room_db.get_room_by_location(reservation["itemName"]).id
+            room_id = room_db.get_room_by_room_number(reservation["itemName"]).id
             date = datetime.fromisoformat(reservation["from"]).date()
             start_time = datetime.fromisoformat(reservation["from"]).time()
             end_time = datetime.fromisoformat(reservation["to"]).time()
@@ -114,32 +113,6 @@ class RoomAvailabilityScraper:
             bookings.append(reservation)
 
         return bookings
-
-    # Filters availability data to only those bookings that overlap with the current time.
-    # Future bookings can fluctuate, so this should give the most accurate picture of room usage.
-    def get_current_bookings(self, availability_data):
-        current_bookings = []
-        current_time = datetime.now()
-        for slot in availability_data:
-            if 'className' in slot and slot["itemId"] in self.ITEM_ID_TO_ROOM_MAP:
-                if slot["className"] == "s-lc-eq-checkout":
-                    start_time = datetime.fromisoformat(slot["start"])
-                    end_time = datetime.fromisoformat(slot["end"])
-                    if start_time < current_time < end_time:
-                        current_bookings.append(slot)
-
-        return current_bookings
-
-    def send_to_db(self, availability_data):
-        db = get_db()
-        for slot in availability_data:
-            if 'className' in slot and slot["itemId"] in self.itemIdtoRoomMap:
-                if slot["className"] == "s-lc-eq-checkout":
-                    reservation_date = slot["start"][0:10]
-                    start_time = slot["start"][11:]
-                    end_time = slot["end"][11:]
-                    room_location = self.itemIdtoRoomMap[slot["itemId"]]
-                    db.add_room_reservation(reservation_date, start_time, end_time, room_location)
 
 ra_scraper = RoomAvailabilityScraper()
 print(ra_scraper.scrape_room_bookings())

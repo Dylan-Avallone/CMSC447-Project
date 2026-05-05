@@ -7,16 +7,16 @@ class DBPrinterFunctions:
     def get_printers(self):
         query = """
         SELECT
-            printer_id,
-            printer_name,
-            printer_location,
-            printer_model,
+            id,
+            name,
+            location,
+            model,
             curr_status,
             toner_level,
             paper_level,
             last_maintenance
         FROM Printer
-        ORDER BY printer_name ASC
+        ORDER BY name ASC
         """
         params = ()
         return self.db.get_all(query, params)

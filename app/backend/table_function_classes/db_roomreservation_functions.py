@@ -49,6 +49,7 @@ class DBRRFunctions:
                 query = "SELECT * FROM RoomReservations WHERE id = ?"
                 params = (reservation.id,)
             else:
+                # The three of these parameters will specify a row
                 query = "SELECT * FROM RoomReservations WHERE room_id = ? AND reservation_date = ?, AND start_time = ?"
                 params = (reservation.room_id, reservation.date.isoformat(), reservation.start_time.isoformat())
 
@@ -58,8 +59,8 @@ class DBRRFunctions:
                     query = "UPDATE RoomReservations SET created_at = ?, is_canceled = ?, WHERE room_id = ?"
                     params = (reservation.request_timestamp.isoformat(), 0, reservation.room_id)
             else:
-                query = "INSERT INTO RoomReservations (room_id, reservation_date, start_time, end_time, request_timestamp) VALUES (?, ?, ?, ?, ?)"
-                params = (reservation.room_id, reservation.date.isoformat(), reservation.start_time.isoformat(), reservation.end_time.isoformat(), reservation.request_timestamp)
+                query = "INSERT INTO RoomReservations (student_name, room_id, reservation_date, start_time, end_time, request_timestamp) VALUES (?, ?, ?, ?, ?, ?)"
+                params = (reservation.student_name, reservation.room_id, reservation.date.isoformat(), reservation.start_time.isoformat(), reservation.end_time.isoformat(), reservation.request_timestamp)
 
             self.db.execute_command(query, params)
 
@@ -78,5 +79,5 @@ class DBRRFunctions:
         return reservations
 
     def refresh_data(self):
-        new_data = self.reservation_scraper.scrape_room_availability(datetime.date.today(), datetime.date.today() + datetime.timedelta(days=7))
-        self.add_reservations(self.reservation_scraper.format_availability_data(new_data))
+        new_data = self.reservation_scraper.scrape_room_bookings()
+        self.add_reservations(self.reservation_scraper.format_booking_data(new_data))
