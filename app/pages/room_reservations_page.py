@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import date
 from app.backend.get_db import get_db
 from app.backend.table_function_classes.db_roomreservation_functions import DBRRFunctions
+from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
 
 if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
     st.warning("You must be signed in to access this page.")
@@ -13,7 +14,6 @@ if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
     if st.button("Back to Home", key="security"):
             st.switch_page("pages/home_page.py")
     st.stop()
-    
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
@@ -26,6 +26,7 @@ st.set_page_config(
 
 db = get_db()
 rr_functions = DBRRFunctions(db)
+room_functions = DBRoomFunctions(db)
 
 #home button
 if st.button("Back to Home"):
@@ -44,6 +45,10 @@ rr_functions.refresh_data()
 rows = rr_functions.get_reservations()
 
 df = pd.DataFrame([rr.to_row() for rr in rows])
+df["is_canceled"] = df["is_canceled"].map({False: "No", True: "Yes"})
+df["room_id"] = df["room_id"].map(room_functions.get_room_mapping())
+df.columns = ["ID", "Room Name", "Date", "Start Time", "End Time", "Request Timestamp", "Is Cancelled"]
+
 
 if df.empty:
     st.info("No reservation data available yet.")
@@ -52,8 +57,8 @@ if df.empty:
 # -----------------------------
 # Cleanup / formatting
 
-df["start_time"] = df["start_time"].astype(str).str[:5]
-df["end_time"] = df["end_time"].astype(str).str[:5]
+df["Start Time"] = df["Start Time"].astype(str).str[:5]
+df["End Time"] = df["End Time"].astype(str).str[:5]
 
 today = date.today()
 
@@ -68,7 +73,7 @@ def classify_period(reservation_date):
         return "Today"
     return "Future"
 
-df["Period"] = df["reservation_date"].apply(classify_period)
+df["Period"] = df["Date"].apply(classify_period)
 
 # -----------------------------
 # Top metrics
@@ -77,95 +82,74 @@ total_reservations = len(df)
 past_count = len(df[df["Period"] == "Past"])
 today_count = len(df[df["Period"] == "Today"])
 future_count = len(df[df["Period"] == "Future"])
+cancellation_count = len(df[df["Is Cancelled"] == "Yes"])
 
-m1, m2, m3, m4 = st.columns(4)
+m1, m2, m3, m4, m5 = st.columns(5)
 m1.metric("Total", total_reservations)
 m2.metric("Past", past_count)
 m3.metric("Today", today_count)
 m4.metric("Upcoming", future_count)
+m5.metric("Cancelled", cancellation_count)
 
 st.markdown("---")
 
 # -----------------------------
 # Filters
-
 st.subheader("Filters")
 
-c1, c2, c3 = st.columns(3)
+c1, c2 = st.columns(2)
 
 with c1:
-    search_text = st.text_input(
-        "Search by person or purpose",
-        placeholder="e.g. study group, Ava Johnson"
-    )
-
-with c2:
     period_filter = st.selectbox(
         "Timeframe",
         ["All", "Past", "Today", "Future"]
     )
 
-with c3:
-    room_options = ["All"] + sorted(df["room_id"].dropna().unique().tolist())
-    room_filter = st.selectbox("Room", room_options)
+with c2:
+    room_options = ["All"] + sorted(df["Room Name"].dropna().unique().tolist())
+    room_filter = st.selectbox("Room Name", room_options)
 
 filtered_df = df.copy()
-
-if search_text:
-    q = search_text.strip().lower()
-    filtered_df = filtered_df[
-        filtered_df["Reserved By"].str.lower().str.contains(q, na=False) |
-        filtered_df["Purpose"].str.lower().str.contains(q, na=False)
-    ]
 
 if period_filter != "All":
     filtered_df = filtered_df[filtered_df["Period"] == period_filter]
 
 if room_filter != "All":
-    filtered_df = filtered_df[filtered_df["Room"] == room_filter]
+    filtered_df = filtered_df[filtered_df["Room Name"] == room_filter]
 
-filtered_df = filtered_df.sort_values(
-    by=["reservation_date", "start_time", "room_id"],
-    ascending=[True, True, True]
-)
-
+filtered_df = filtered_df.sort_values(by=["Date", "Start Time", "Room Name"], ascending=[True, True, True])
 
 # -----------------------------
 # Main reservation table
-
 st.subheader("Reservation Timeline")
-
-st.dataframe(
-    filtered_df,
-    use_container_width=True,
-    hide_index=True
-)
-
+st.dataframe(filtered_df,
+             use_container_width=True,
+             hide_index=True,
+             column_config={"Request Timestamp": None})
 
 # -----------------------------
 # Sectioned views
-
 st.markdown("---")
 st.subheader("Grouped Views")
 
 tab1, tab2, tab3 = st.tabs(["Today", "Upcoming", "Past"])
 
 with tab1:
-    today_df = df[df["Period"] == "Today"].sort_values(by=["start_time", "room_id"])
+    today_df = df[df["Period"] == "Today"].sort_values(by=["Start Time", "Room Name"])
     if today_df.empty:
         st.info("No reservations scheduled for today.")
     else:
         st.dataframe(today_df, use_container_width=True, hide_index=True)
 
 with tab2:
-    future_df = df[df["Period"] == "Future"].sort_values(by=["reservation_date", "start_time"])
+    future_df = df[df["Period"] == "Future"].sort_values(by=["Date", "Start Time"])
     if future_df.empty:
         st.info("No upcoming reservations.")
     else:
         st.dataframe(future_df, use_container_width=True, hide_index=True)
 
 with tab3:
-    past_df = df[df["Period"] == "Past"].sort_values(by=["reservation_date", "start_time"], ascending=[False, False])
+    past_df = df[df["Period"] == "Past"].sort_values(by=["Date", "Start Time"], ascending=[False, False])
     if past_df.empty:
         st.info("No past reservations found.")
     else:

@@ -3,29 +3,28 @@ import warnings
 from datetime import datetime, timedelta, time
 from app.backend.get_db import get_db
 from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
+from app.backend.table_function_classes.db_user_functions import DBUserFunctions
 from app.backend.table_object_classes.room_reservation import RoomReservation
 
 class RoomAvailabilityScraper:
-    URL = "https://umbc.libcal.com/spaces/availability/grid"
+    URL = "https://umbc.libcal.com/spaces/bookings/search"
     HEADERS = {
-        "accept": "application/json, text/javascript, */*; q=0.01",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "origin": "https://umbc.libcal.com",
-        "referer": "https://umbc.libcal.com/spaces?lid=662",
-        "user-agent": "Mozilla/5.0",
-        "x-requested-with": "XMLHttpRequest"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "en-US,en;q=0.9",
+        "referer": "https://umbc.libcal.com/spaces/bookings?lid=662&gid=0",
+        "X-Requested-With": "XMLHttpRequest",
     }
-    DATA = {
+    PARAMS = {
         "lid": 662,
         "gid": 0,
-        "eid": -1,
-        "seat": 0,
-        "seatId": 0,
-        "zone": 0,
-        "start": "",
-        "end": "",
-        "pageIndex": 0,
-        "pageSize": 18
+        "draw": 1,
+        "start": 0,
+        "length": 100,
+        "d": "90",  # "Next 90 days" is usually more reliable than "all"
+        "customDate": "",
+        "search[value]": "",  # The API expects the search object keys
+        "search[regex]": "false"
     }
 
     # There's a few IDs here that don't map to any visible rooms on the page. For completeness I still included them and marked them as None type.
@@ -78,52 +77,41 @@ class RoomAvailabilityScraper:
 
     # Apparently, requesting more than 31 days of room booking data causes an error.
     # To handle this, then, I will split requests for more than 31 days of data into multiple requests.
-    def scrape_room_availability(self, start_day_, end_day_):
+    def scrape_room_bookings(self):
         """
-        :param start_day_: A datetime.date object.
-        :param end_day_: A datetime.date object.
-        :return: A list of dictionaries returned by the API call representing timeslots, reserved or not.
+        :return: A list of dictionaries returned by the API call representing bookings. An example returned dictionary looks like:
+        {'from': '2026-05-11 14:00:00',
+        'to': '2026-05-11 15:00:00',
+        'nickname': '',
+        'itemId': 134146,
+        'itemName': '204',
+        'itemHasMoreInfo': False,
+        'categoryName': 'Individual Study Rooms',
+        'categoryUrl': '/spaces?lid=662&gid=7691',
+        'locationName': 'AOK Library',
+        'seatName': ''}
         """
-        result = []
-        start_day = start_day_
-        temp_end_day = start_day_
-        end_day = end_day_
-        num_days = (end_day_ - start_day).days
-        while num_days > 0:
-            days_requested = min(num_days, self.MAX_REQUESTABLE_DAYS)
-            temp_end_day += timedelta(days=days_requested)
-            self.DATA["start"] = start_day.strftime("%Y-%m-%d")
-            self.DATA["end"] = temp_end_day.strftime("%Y-%m-%d")
-            res = requests.post(self.URL, headers=self.HEADERS, data=self.DATA)
-            result.extend(res.json()["slots"])
-            start_day = end_day
-            num_days -= days_requested
+        res = requests.get(self.URL, headers=self.HEADERS, params=self.PARAMS)
+        return res.json()["data"]
 
-        return result
-
-    def format_availability_data(self, availability_data):
+    def format_booking_data(self, booking_data):
         """
         Note, all dictionaries without the "className" key (which is how the UMBC library tags timeslots that are reserved) are tossed.
-        :param availability_data: A list of dictionaries representing bookings. Probably taken from get_current_bookings().
+        :param booking_data: A list of dictionaries representing bookings. Probably taken from get_current_bookings().
         :return: A list of RoomReservation objects.
         """
         room_db = DBRoomFunctions(get_db())
+        user_db = DBUserFunctions(get_db())
         bookings = []
-        for slot in availability_data:
-            if 'className' in slot and slot["itemId"] in self.ITEM_ID_TO_ROOM_MAP:
-                if self.ITEM_ID_TO_ROOM_MAP[slot["itemId"]] is None:
-                    warnings.warn("The system doesn't a name for this room!")
-                else:
-                    if slot["className"] == "s-lc-eq-checkout":
-                        room_id = room_db.get_room_by_location(self.ITEM_ID_TO_ROOM_MAP[slot["itemId"]]).id
-                        date = datetime.fromisoformat(slot["start"]).date()
-                        start_time = datetime.fromisoformat(slot["start"]).time()
-                        end_time = datetime.fromisoformat(slot["end"]).time()
-                        request_timestamp = datetime.now()
-                        reservation = RoomReservation(-1, room_id, date, start_time, end_time, request_timestamp)
-                        bookings.append(reservation)
-                    else:
-                        warnings.warn("Unknown className encountered. You should check on this.")
+        for reservation in booking_data:
+            student_name = reservation["nickname"]
+            room_id = room_db.get_room_by_location(reservation["itemName"]).id
+            date = datetime.fromisoformat(reservation["from"]).date()
+            start_time = datetime.fromisoformat(reservation["from"]).time()
+            end_time = datetime.fromisoformat(reservation["to"]).time()
+            request_timestamp = datetime.now()
+            reservation = RoomReservation(-1, student_name, room_id, date, start_time, end_time, request_timestamp)
+            bookings.append(reservation)
 
         return bookings
 
@@ -153,6 +141,8 @@ class RoomAvailabilityScraper:
                     room_location = self.itemIdtoRoomMap[slot["itemId"]]
                     db.add_room_reservation(reservation_date, start_time, end_time, room_location)
 
+ra_scraper = RoomAvailabilityScraper()
+print(ra_scraper.scrape_room_bookings())
 """
 #@st.cache_data(ttl=3600)
 def scrape_hourly():

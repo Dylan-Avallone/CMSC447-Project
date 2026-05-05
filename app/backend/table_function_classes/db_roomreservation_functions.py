@@ -65,7 +65,7 @@ class DBRRFunctions:
 
     def get_reservations(self):
         """
-        Returns a list of all active reservations as RoomReservation objects.
+        Returns a list of all reservations as RoomReservation objects.
         """
         reservations = []
         query = "SELECT * FROM RoomReservations WHERE is_canceled = 0"

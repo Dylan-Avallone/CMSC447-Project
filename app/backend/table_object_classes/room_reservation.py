@@ -1,15 +1,17 @@
 from dataclasses import dataclass
 from datetime import datetime, time, date
+from app.backend.table_object_classes.table_object import TableObject
 
 @dataclass
-class RoomReservation:
+class RoomReservation(TableObject):
     id: int
+    student_name: str
     room_id: int
     date: date
     start_time: time
     end_time: time
     request_timestamp: datetime
-    is_canceled: int = 0
+    is_canceled: bool = False
 
     def __post_init__(self):
         if self.is_canceled != 0 and self.is_canceled != 1:
@@ -35,17 +37,19 @@ class RoomReservation:
     def from_row(cls, row):
         try:
             return cls(row["id"],
+                       row["student_name"],
                        row["room_id"],
                        date.fromisoformat(row["reservation_date"]),
                        time.fromisoformat(row["start_time"]),
                        time.fromisoformat(row["end_time"]),
                        row["request_timestamp"],
-                       row["is_canceled"])
+                       bool(row["is_canceled"]))
         except (KeyError, IndexError) as e:
             raise AttributeError(f"Database Mapping Error: Column {e} not found in row passed to from_row") from e
 
     def to_row(self):
         return {"id": self.id,
+                "student_name": self.student_name,
                 "room_id": self.room_id,
                 "reservation_date": self.date,
                 "start_time": self.start_time,
@@ -53,4 +57,3 @@ class RoomReservation:
                 "request_timestamp": self.request_timestamp,
                 "is_canceled": self.is_canceled
         }
-

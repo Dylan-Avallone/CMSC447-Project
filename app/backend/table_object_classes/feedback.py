@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import ClassVar
+from app.backend.table_object_classes.table_object import TableObject
 
 @dataclass
-class Feedback:
+class Feedback(TableObject):
     MAX_LENGTH: ClassVar[int] = 1000
     TYPES: ClassVar[list] = ['bug report', 'feature request', 'compliment']
     type: str

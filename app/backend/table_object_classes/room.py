@@ -1,12 +1,13 @@
 from dataclasses import dataclass
+from typing import ClassVar
 from .table_object import TableObject
 import datetime
 
 @dataclass
 class Room(TableObject):
     id: int
-    name: str
-    location: str
+    type: str
+    number: str
     capacity: int
     description: str
     wd_availability_start: datetime.time
@@ -15,6 +16,7 @@ class Room(TableObject):
     sat_availability_end: datetime.time
     sun_availability_start: datetime.time
     sun_availability_end: datetime.time
+    TYPES: ClassVar[list] = ['Group', 'Individual']
 
     def __post_init__(self):
         if self.capacity <= 0:
@@ -25,6 +27,8 @@ class Room(TableObject):
             raise AttributeError("Room sat_availability_start must be before sat_availability_end")
         if self.sun_availability_start > self.sun_availability_end:
             raise AttributeError("Room sun_availability_start must be before sun_availability_end")
+        if self.type not in self.TYPES:
+            raise ValueError("Invalid type {}".format(self.type))
 
     @classmethod
     def from_row(cls, row):

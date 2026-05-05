@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS Departments (
 
 CREATE TABLE IF NOT EXISTS Room (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(50) NOT NULL,
-    location VARCHAR(100),
+    type VARCHAR(50) NOT NULL,
+    number VARCHAR(100),
     capacity INT,
     description VARCHAR(250),
     wd_avblty_start TIME,
@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS Room (
 
 CREATE TABLE IF NOT EXISTS RoomReservations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_name VARCHAR(50),
     room_id INT NOT NULL,
     reservation_date DATE NOT NULL,
     start_time TIME NOT NULL,
