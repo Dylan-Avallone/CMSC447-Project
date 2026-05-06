@@ -1,6 +1,7 @@
 import sqlite3
 import os
 
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 class DB:
     feedback_limit = 1000
