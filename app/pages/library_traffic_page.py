@@ -2,12 +2,20 @@ import streamlit as st
 import pandas as pd
 import sys
 from pathlib import Path
-from app.backend.get_db import get_db
+from app.backend.db import DB
+from app.backend.table_function_classes.db_libraryentrylog_functions import DBLELFunctions
 
 PAGE_DIR = Path(__file__).resolve().parent
 APP_DIR = PAGE_DIR.parent
 PROJECT_ROOT = APP_DIR.parent
 sys.path.append(str(PROJECT_ROOT))
+
+if not "db" in st.session_state:
+    st.session_state["db"] = DB()
+
+if not "lel_functions" in st.session_state:
+    st.session_state["lel_functions"] = DBLELFunctions(st.session_state["db"])
+lel_functions = st.session_state["lel_functions"]
 
 st.set_page_config(page_title="Library Traffic", page_icon="X", layout="wide")
 
@@ -19,8 +27,6 @@ if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
         st.switch_page("pages/home_page.py")
     st.stop()
 
-db = get_db()
-
 if st.button("Back to Home"):
     st.switch_page("pages/home_page.py")
 
@@ -28,7 +34,7 @@ st.title("Library Traffic")
 st.caption("Gate counter analytics for library entrance volume and peak usage patterns.")
 
 
-rows = db.get_library_entry_log()
+rows = lel_functions.get_library_entry_log()
 
 df = pd.DataFrame(rows, columns=["Entry ID", "Entry Time", "Entry Count"])
 

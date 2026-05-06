@@ -1,7 +1,7 @@
 import streamlit as st
 from pathlib import Path
 import sys
-from app.backend.get_db import get_db
+from app.backend.db import DB
 from app.backend.table_function_classes.db_roomreservation_functions import DBRRFunctions
 from app.backend.table_function_classes.db_printer_functions import DBPrinterFunctions
 from app.backend.table_function_classes.db_user_functions import DBUserFunctions
@@ -20,10 +20,20 @@ sys.path.append(str(PROJECT_ROOT))
 ASSETS_DIR = APP_DIR / "assets"
 LOGO_PATH = ASSETS_DIR / "umbclogo.png"
 
-db = get_db()
-rr_functions = DBRRFunctions(db)
-printer_functions = DBPrinterFunctions(db)
-user_functions = DBUserFunctions(db)
+if not "db" in st.session_state:
+    st.session_state["db"] = DB()
+
+if not "rr_functions" in st.session_state:
+    st.session_state["rr_functions"] = DBRRFunctions(st.session_state["db"])
+rr_functions = st.session_state["rr_functions"]
+
+if not "printer_functions" in st.session_state:
+    st.session_state["printer_functions"] = DBPrinterFunctions(st.session_state["db"])
+printer_functions = st.session_state["printer_functions"]
+
+if not "user_functions" in st.session_state:
+    st.session_state["user_functions"] = DBUserFunctions(st.session_state["db"])
+user_functions = st.session_state["user_functions"]
 
 #sys overview
 pending_reservations_count = rr_functions.get_reservations_count()

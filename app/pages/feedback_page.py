@@ -8,18 +8,27 @@ from app.backend.table_object_classes.feedback import Feedback
 from app.backend.table_function_classes.db_feedback_functions import DBFeedbackFunctions
 from app.backend.table_function_classes.db_user_functions import DBUserFunctions
 from app.backend.constants import NOT_FETCHED
-from app.backend.get_db import get_db
-from datetime import datetime
+from app.backend.db import DB
+from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-db = get_db()
-feedback_functions = DBFeedbackFunctions(db)
-user_functions = DBUserFunctions(db)
+if not "db" in st.session_state:
+    st.session_state["db"] = DB()
+db = st.session_state["db"]
+
+if not "feedback_functions" in st.session_state:
+    st.session_state["feedback_functions"] = DBFeedbackFunctions(st.session_state["db"])
+feedback_functions = st.session_state["feedback_functions"]
+
+if not "user_functions" in st.session_state:
+    st.session_state["user_functions"] = DBUserFunctions(st.session_state["db"])
+user_functions = st.session_state["user_functions"]
 
 if not "user" in st.session_state:
     if st.user.is_logged_in:
-        st.session_state["user"] = user_functions.get_user(st.user.email)
+        user = User(-1, "", st.user.email, "user")
+        st.session_state["user"] = user_functions.get_user(user)
     else:
         st.session_state["user"] = User()
 
@@ -58,21 +67,20 @@ content = st.text_area("Enter your feedback", max_chars=Feedback.MAX_LENGTH)
 submit = st.button("Submit")
 if submit:
     most_recent_feedback = feedback_functions.get_last_feedback(st.session_state["user"])
-    time_since_last_submission = sys.maxsize
+    minutes_since_last_submission = sys.maxsize
     if most_recent_feedback is NOT_FETCHED:
-        st.write("Failed to try to fetch user feedback")
+        st.error("Failed to try to fetch user feedback")
     else:
-        if most_recent_feedback.created_at is not None:
-            time_since_last_submission = datetime.now() - most_recent_feedback.created_at
+        if most_recent_feedback is not None:
+            minutes_since_last_submission = (datetime.now(timezone.utc) - most_recent_feedback.submission_time).total_seconds() / 60
 
-    if time_since_last_submission.minutes < 5:
-        st.error("Can't submit feedback less than 5 minutes apart. Please wait {} minutes before submitting.".format(5 - time_since_last_submission.minutes))
-    elif content is None:
+    if content == "":
         st.error("Please enter a description before submitting!")
+    elif minutes_since_last_submission < 5:
+        st.error("Can't submit feedback less than 5 minutes apart. Please wait {:.0f} minutes before submitting.".format(5 - minutes_since_last_submission))
     else:
-        feedback = Feedback(option, content)
+        feedback = Feedback(type=option, content=content, user_id=st.session_state["user"].id)
         feedback_functions.add_feedback(feedback)
         email_feedback(feedback)
         st.success("Feedback submitted successfully!")
-
-    st.write(db.get_printable_table("FeedbackForms"))
+        st.write("Time since last feedback submission: ", minutes_since_last_submission)

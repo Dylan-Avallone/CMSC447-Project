@@ -4,11 +4,11 @@ from app.backend.table_object_classes.table_object import TableObject
 
 @dataclass
 class User(TableObject):
-    ROLES: ClassVar[list] = ["admin", "user", "developer", None]
+    ROLES: ClassVar[list] = ["admin", "user", "developer", ""]
     id: int = -1
     name: str = "Anonymous"
-    email: str = None
-    role: str = None
+    email: str = ""
+    role: str = ""
 
     def __post_init__(self):
         self.check_valid_role()

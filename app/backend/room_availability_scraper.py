@@ -1,10 +1,7 @@
 import requests
-import warnings
-from datetime import datetime, timedelta, time
-import time as t
-from app.backend.get_db import get_db
+from datetime import datetime
+from app.backend.db import DB
 from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
-from app.backend.table_function_classes.db_user_functions import DBUserFunctions
 from app.backend.table_object_classes.room_reservation import RoomReservation
 
 class RoomAvailabilityScraper:
@@ -54,13 +51,14 @@ class RoomAvailabilityScraper:
             it += 1
         return full_res
 
-    def format_booking_data(self, booking_data):
+    @staticmethod
+    def format_booking_data(booking_data):
         """
         Note, all dictionaries without the "className" key (which is how the UMBC library tags timeslots that are reserved) are tossed.
         :param booking_data: A list of dictionaries representing bookings. Probably taken from get_current_bookings().
         :return: A list of RoomReservation objects.
         """
-        room_db = DBRoomFunctions(get_db())
+        room_db = DBRoomFunctions(DB())
         bookings = []
         for reservation in booking_data:
             student_name = reservation["nickname"]

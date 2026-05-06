@@ -7,7 +7,7 @@ class DBLELFunctions:
     def get_library_entry_log(self):
         query = """
         SELECT
-            entry_id,
+            id,
             entry_time,
             entry_count
         FROM LibraryEntryLog

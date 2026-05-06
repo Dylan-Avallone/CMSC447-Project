@@ -58,6 +58,7 @@ class DB:
         this function will return an empty object.
         """
         result = NOT_FETCHED
+        print(NOT_FETCHED, "get_all")
         try:
             result = self.execute_command(command, params).fetchall()
         except sqlite3.Error as e:

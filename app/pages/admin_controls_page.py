@@ -2,7 +2,7 @@ import streamlit as st
 from pathlib import Path
 import sys
 import pandas as pd
-from app.backend.get_db import get_db
+from app.backend.db import DB
 from app.backend.table_object_classes.user import User
 from app.backend.table_function_classes.db_user_functions import DBUserFunctions
 
@@ -32,8 +32,13 @@ PAGE_DIR = Path(__file__).resolve().parent
 APP_DIR = PAGE_DIR.parent
 PROJECT_ROOT = APP_DIR.parent
 sys.path.append(str(PROJECT_ROOT))
-db = get_db()
-db_user_functions = DBUserFunctions(db)
+
+if not "db" in st.session_state:
+    st.session_state["db"] = DB()
+
+if not "user_functions" in st.session_state:
+    st.session_state["user_functions"] = DBUserFunctions(st.session_state["db"])
+db_user_functions = st.session_state["user_functions"]
 
 st.set_page_config(page_title="Book Management", page_icon="x", layout="wide")
 st.title("Admin Controls")
