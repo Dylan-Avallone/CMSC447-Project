@@ -1,6 +1,7 @@
 import requests
 import warnings
 from datetime import datetime, timedelta, time
+import time as t
 from app.backend.get_db import get_db
 from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
 from app.backend.table_function_classes.db_user_functions import DBUserFunctions
@@ -27,56 +28,6 @@ class RoomAvailabilityScraper:
         "search[regex]": "false"
     }
 
-    # There's a few IDs here that don't map to any visible rooms on the page. For completeness I still included them and marked them as None type.
-    ITEM_ID_TO_ROOM_MAP = {
-        4482: 'RLC Seminar Room',
-        4484: '374',
-        4485: '373',
-        4486: '372',
-        4487: '371',
-        4488: '370',
-        4489: '369',
-        7813: '210',
-        7814: '211',
-        7815: '212',
-        7816: '213',
-        7817: '453',
-        7818: '454',
-        7819: '456',
-        7820: '457',
-        7821: '755',
-        14465: '258',
-        19760: '208',
-        19773: '209',
-        19774: '231',
-        19782: '232',
-        23252: '207',
-        30943: '206',
-        30977: '257',
-        43107: '368',
-        107579: None,
-        107867: None,
-        113401: None,
-        115150: None,
-        134141: None,
-        134144: None,
-        134145: None,
-        134146: '204',
-        134147: '205',
-        144560: None,
-        144561: None,
-        144562: None,
-        144563: None,
-        144564: None,
-        144565: None,
-        144566: None,
-        144567: None,
-        144568: None
-    }
-    MAX_REQUESTABLE_DAYS = 31
-
-    # Apparently, requesting more than 31 days of room booking data causes an error.
-    # To handle this, then, I will split requests for more than 31 days of data into multiple requests.
     def scrape_room_bookings(self):
         """
         :return: A list of dictionaries returned by the API call representing bookings. An example returned dictionary looks like:
@@ -91,8 +42,17 @@ class RoomAvailabilityScraper:
         'locationName': 'AOK Library',
         'seatName': ''}
         """
-        res = requests.get(self.URL, headers=self.HEADERS, params=self.PARAMS)
-        return res.json()["data"]
+        self.PARAMS["start"] = 0
+        full_res = []
+        result = requests.get(self.URL, headers=self.HEADERS, params=self.PARAMS).json()["data"]
+        full_res.extend(result)
+        it = 0
+        while result and it < 20:
+            self.PARAMS["start"] += self.PARAMS["length"]
+            result = requests.get(self.URL, headers=self.HEADERS, params=self.PARAMS).json()["data"]
+            full_res.extend(result)
+            it += 1
+        return full_res
 
     def format_booking_data(self, booking_data):
         """
@@ -115,7 +75,8 @@ class RoomAvailabilityScraper:
         return bookings
 
 ra_scraper = RoomAvailabilityScraper()
-print(ra_scraper.scrape_room_bookings())
+data = ra_scraper.scrape_room_bookings()
+reservations = ra_scraper.format_booking_data(data)
 """
 #@st.cache_data(ttl=3600)
 def scrape_hourly():

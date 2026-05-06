@@ -1,22 +1,47 @@
 import streamlit as st
 import pandas as pd
 import sys
+import numpy as np
+import tracemalloc
 from pathlib import Path
-from datetime import date
+from datetime import date, datetime, timedelta
 from app.backend.get_db import get_db
 from app.backend.table_function_classes.db_roomreservation_functions import DBRRFunctions
 from app.backend.table_function_classes.db_room_functions import DBRoomFunctions
 from app.backend.table_object_classes.room_reservation import RoomReservation
+from app.backend.table_object_classes.room import Room
 
 db = get_db()
 rr_functions = DBRRFunctions(db)
 room_functions = DBRoomFunctions(db)
 
-def get_utilization_by_hour(room_number, reservations: list[RoomReservation]):
-    reservations_in_room = [reservation for reservation in reservations
-                            if reservation.room_id == room_functions.get_room_by_room_number(room_number).id]
+def get_utilization_by_hour(room_: Room, reservations: list[RoomReservation], start_date: date, end_date: date):
+    util_list = []
+    filtered_reservations = [reservation for reservation in reservations
+                            if (reservation.room_id == room_.id or room == "All")
+                            and start_date <= reservation.date <= end_date]
+    first_hour = min(room_.wd_availability_start, room_.sat_availability_start, room_.sun_availability_start)
+    curr_hour = first_hour
+    last_hour = max(room_.wd_availability_end, room_.sat_availability_end, room_.sun_availability_end)
+    it = 0
+    while curr_hour <= last_hour and it < 24:
+        total_hours_across_dates = 0
+        total_hours_across_dates += np.busday_count(start_date, end_date) * (room_.wd_availability_start <= curr_hour < room_.wd_availability_end)
+        total_hours_across_dates += np.busday_count(start_date, end_date, weekmask='0000010') * (room_.sat_availability_start <= curr_hour < room_.sat_availability_end)
+        total_hours_across_dates += np.busday_count(start_date, end_date, weekmask='0000001') * (room_.sun_availability_start <= curr_hour < room_.sun_availability_end)
+        if total_hours_across_dates > 0:
+            total_reservation_hours = len([r for r in filtered_reservations if r.start_time <= curr_hour < r.end_time])
+            util_list.append((curr_hour, total_reservation_hours, total_hours_across_dates))
+        else:
+            pass
+
+        curr_hour = (datetime.combine(date.today(), curr_hour) + timedelta(hours=1)).time()
+        it += 1
+
+    return util_list
 
 
+tracemalloc.start()
 if not (hasattr(st.user, "is_logged_in") and st.user.is_logged_in):
     st.warning("You must be signed in to access this page.")
     if st.button("Go to Login"):
@@ -59,6 +84,7 @@ if df.empty:
 
 # -----------------------------
 # Cleanup / formatting
+df["Room Name"] = df["Room Name"].astype("category")
 df["Start Time"] = df["Start Time"].astype(str).str[:5]
 df["End Time"] = df["End Time"].astype(str).str[:5]
 
@@ -164,5 +190,16 @@ with tab3:
         st.dataframe(past_df, use_container_width=True, hide_index=True)
 
 st.subheader("Room Utilization")
-utilization_df = pd.DataFrame()
-st.line_chart()
+c1, c2, c3 = st.columns(3)
+with c1:
+    room_options = ["All"] + sorted(df["Room Name"].dropna().unique().tolist())
+    room_filter = st.selectbox("Room Name", room_options)
+if room_filter != "All":
+    room = room_functions.get_room_by_room_number(room_filter)
+    utilization_df = pd.DataFrame(
+    get_utilization_by_hour(room, rows, datetime.now().date(), datetime.now().date() + timedelta(days=10)))
+else:
+    room = "All"
+utilization_df.columns = ["Hour", "Utilization"]
+utilization_df.set_index("Hour", inplace=True)
+st.dataframe(utilization_df, use_container_width=True)
